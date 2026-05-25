@@ -9,11 +9,13 @@ import { ThemeProvider } from './themes/ThemeProvider';
 import { getDefaultTheme } from './themes/presets';
 import ThemeLoader from './themes/ThemeLoader';
 import { useEffect, useRef, lazy, Suspense } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const ArticlePage = lazy(() => import('./pages/ArticlePage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
 const AboutUsPage = lazy(() => import('./pages/AboutUsPage'));
 const OurTeamPage = lazy(() => import('./pages/OurTeamPage'));
 const AdvertisePage = lazy(() => import('./pages/AdvertisePage'));
@@ -89,6 +91,7 @@ function AppContent() {
             <Route path="/" element={<HomePage />} />
             <Route path="/article/:id" element={<ArticlePage />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/team" element={<OurTeamPage />} />
             <Route path="/advertise" element={<AdvertisePage />} />
@@ -109,11 +112,13 @@ export default function App() {
   const defaultTheme = getDefaultTheme();
   
   return (
-    <ThemeProvider defaultTheme={defaultTheme.config}>
-      <ThemeLoader />
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider defaultTheme={defaultTheme.config}>
+        <ThemeLoader />
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }

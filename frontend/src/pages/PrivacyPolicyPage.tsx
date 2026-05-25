@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import PageNav from '../components/ui/PageNav';
+import SeoHead from '../components/seo/SeoHead';
 
 export default function PrivacyPolicyPage() {
   const sections = [
@@ -27,6 +28,7 @@ export default function PrivacyPolicyPage() {
       animate={{ opacity: 1 }}
       className="bg-white dark:bg-[#0a0a0a] min-h-screen"
     >
+      <SeoHead title="Privacy Policy" description="JM News privacy policy — how we collect, use, and protect your personal information." />
       <PageNav label="Privacy Policy" />
       <div className="max-w-3xl mx-auto px-6 py-16 lg:py-24">
       <header className="mb-16 border-b-2 border-amber-600 pb-4">

@@ -10,6 +10,9 @@ import { apiGetArticle, apiGetArticleBySlug, apiTrackArticleView } from '../lib/
 import { NewsItem } from '../types';
 import { useThemeComponents } from '../themes/useTheme';
 import { getArticleUrl } from '../lib/urls';
+import SeoHead from '../components/seo/SeoHead';
+import JsonLd, { articleLd } from '../components/seo/JsonLd';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
 
 const DEFAULT_TAGS = ['Regional', 'Governance', 'Adamawa'];
 
@@ -138,10 +141,33 @@ export default function ArticlePage() {
 
   return (
     <div className="bg-white dark:bg-[#0a0a0a] min-h-screen">
+      <SeoHead
+        title={story.title}
+        description={story.excerpt}
+        imageUrl={story.imageUrl}
+        url={getArticleUrl(story)}
+        type="article"
+        publishedAt={story.createdAt}
+        author={story.author}
+        tags={story.tags}
+      />
+      <JsonLd data={articleLd({
+        title: story.title,
+        description: story.excerpt,
+        imageUrl: story.imageUrl,
+        url: window.location.href,
+        publishedAt: story.createdAt || new Date().toISOString(),
+        author: story.author,
+      })} />
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4">
 
         {/* Breadcrumb */}
         <PageNav label={story.category} />
+        <Breadcrumbs items={[
+          { label: 'Home', href: '/' },
+          { label: story.category, href: `/category/${story.category.toLowerCase()}` },
+          { label: story.title },
+        ]} />
 
         <div className={`grid grid-cols-1 gap-6 ${hasSidebar ? 'lg:grid-cols-12' : ''}`}>
           {/* Main Article */}

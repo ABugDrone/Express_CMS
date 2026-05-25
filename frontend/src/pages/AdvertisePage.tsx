@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Mail, BarChart3, Globe, Users, Target, Rocket } from 'lucide-react';
 import PageNav from '../components/ui/PageNav';
+import SeoHead from '../components/seo/SeoHead';
 
 export default function AdvertisePage() {
   return (
@@ -9,6 +10,7 @@ export default function AdvertisePage() {
       animate={{ opacity: 1 }}
       className="bg-white dark:bg-[#0a0a0a] min-h-screen"
     >
+      <SeoHead title="Advertise With Us" description="Reach your target audience with JM News. Explore advertising opportunities and sponsorship packages." />
       <PageNav label="Advertise" />
       <div className="max-w-6xl mx-auto px-6 py-16 lg:py-24">
       <div className="flex flex-col gap-20">

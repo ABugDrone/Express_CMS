@@ -174,13 +174,21 @@ function OverviewTab({ onTabChange }: { onTabChange: (t: Tab) => void }) {
     id: number; title: string; category: string; views: number; created_at: string;
   }>>([]);
   const [byCategory, setByCategory] = useState<{ name: string; count: number }[]>([]);
+  const [dailyActivity, setDailyActivity] = useState<{ date: string; count: number }[]>([]);
+  const [topArticles, setTopArticles] = useState<Array<{
+    id: number; title: string; views: number; slug: string;
+  }>>([]);
+  const [articlesThisWeek, setArticlesThisWeek] = useState(0);
 
   useEffect(() => {
     apiGetDashboard()
       .then(data => {
         setStats(data.stats);
         setRecentArticles(data.recent_articles as typeof recentArticles);
-        setByCategory(data.by_category ?? []);
+        setByCategory(data.by_news_type?.map((nt: any) => ({ name: nt.name, count: nt.count })) ?? []);
+        setDailyActivity(data.daily_activity ?? []);
+        setTopArticles(data.top_articles ?? []);
+        setArticlesThisWeek(data.articles_this_week ?? 0);
       })
       .catch(() => {
         // Fallback to local counts
@@ -198,6 +206,9 @@ function OverviewTab({ onTabChange }: { onTabChange: (t: Tab) => void }) {
         const map: Record<string, number> = {};
         news.forEach(n => { map[n.category] = (map[n.category] || 0) + 1; });
         setByCategory(Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count));
+        setDailyActivity([]);
+        setTopArticles([]);
+        setArticlesThisWeek(0);
       });
   }, [news, ads, bannedUserIds]);
 
@@ -234,6 +245,8 @@ function OverviewTab({ onTabChange }: { onTabChange: (t: Tab) => void }) {
             sub={`${stats.spam_comments} spam`} />
           <StatCard label="Drafts" value={stats.drafts} icon={Newspaper}
             color="bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400" />
+          <StatCard label="This Week" value={articlesThisWeek} icon={TrendingUp}
+            color="bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400" />
         </div>
       )}
 
@@ -277,6 +290,48 @@ function OverviewTab({ onTabChange }: { onTabChange: (t: Tab) => void }) {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Daily Activity & Top Articles */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {dailyActivity.length > 0 && (
+          <div className="bg-white dark:bg-[#141414] rounded-2xl border border-gray-100 dark:border-white/5 p-5">
+            <h3 className="text-sm font-black uppercase tracking-widest text-vibrant-text dark:text-white mb-4">Daily Activity (7 days)</h3>
+            <div className="flex items-end gap-2 h-24">
+              {dailyActivity.map(({ date, count }) => {
+                const maxCount = Math.max(...dailyActivity.map(d => d.count), 1);
+                const height = Math.max((count / maxCount) * 100, 4);
+                const dayLabel = new Date(date).toLocaleDateString('en', { weekday: 'short' });
+                return (
+                  <div key={date} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-[9px] font-bold text-gray-400">{count}</span>
+                    <div className="w-full bg-amber-100 dark:bg-amber-900/20 rounded-t relative" style={{ height: `${height}%` }}>
+                      <div className="absolute inset-0 bg-amber-600 rounded-t opacity-80" style={{ height: '100%' }} />
+                    </div>
+                    <span className="text-[8px] text-gray-500 font-bold uppercase">{dayLabel}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-[10px] text-gray-400 mt-4">{articlesThisWeek} articles published this week</p>
+          </div>
+        )}
+        {topArticles.length > 0 && (
+          <div className="bg-white dark:bg-[#141414] rounded-2xl border border-gray-100 dark:border-white/5 p-5">
+            <h3 className="text-sm font-black uppercase tracking-widest text-vibrant-text dark:text-white mb-4">Top Articles</h3>
+            <div className="flex flex-col gap-3">
+              {topArticles.map((a: any, i: number) => (
+                <div key={a.id} className="flex items-center gap-3">
+                  <span className="text-xs font-black text-gray-300 dark:text-gray-600 w-5">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-vibrant-text dark:text-white line-clamp-1">{a.title}</p>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-600">{a.views} views</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ import { useEffect, useState, useRef } from 'react';
 import { apiGetArticles, ApiArticle } from '../lib/api';
 import { useThemeComponents, useThemeLayout } from '../themes/useTheme';
 import { getArticleUrl } from '../lib/urls';
+import SeoHead from '../components/seo/SeoHead';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
 
 const SLUG_TO_CATEGORY: Record<string, string> = {
   'news':          'News',
@@ -82,8 +84,13 @@ export default function CategoryPage() {
       animate={{ opacity: 1 }}
       className="bg-white dark:bg-[#0a0a0a] min-h-screen"
     >
+      <SeoHead title={categoryName} description={`Latest ${categoryName} news and updates`} />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
         <PageNav label={categoryName} />
+        <Breadcrumbs items={[
+          { label: 'Home', href: '/' },
+          { label: categoryName },
+        ]} />
 
         <div className="border-b-2 border-amber-600 pb-4 mb-8">
           <span className="inline-block bg-amber-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 mb-2">

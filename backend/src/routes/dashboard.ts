@@ -6,6 +6,9 @@ const router = Router();
 
 router.get('/dashboard', authenticate, async (_req: Request, res: Response) => {
   try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
     const [
       totalArticles,
       draftArticles,
@@ -20,6 +23,7 @@ router.get('/dashboard', authenticate, async (_req: Request, res: Response) => {
       recentComments,
       topArticles,
       newsTypes,
+      articlesThisWeek,
     ] = await Promise.all([
       prisma.article.count({ where: { isPublished: true } }),
       prisma.article.count({ where: { isPublished: false } }),
@@ -56,7 +60,24 @@ router.get('/dashboard', authenticate, async (_req: Request, res: Response) => {
           }
         }
       }),
+      // Articles created in last 7 days
+      prisma.article.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
     ]);
+
+    // Build daily views (approximate — use createdAt count as proxy for activity)
+    const dailyActivity: { date: string; count: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const day = new Date();
+      day.setDate(day.getDate() - i);
+      const start = new Date(day);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(day);
+      end.setHours(23, 59, 59, 999);
+      const count = await prisma.article.count({
+        where: { createdAt: { gte: start, lte: end } },
+      });
+      dailyActivity.push({ date: day.toISOString().slice(0, 10), count });
+    }
 
     res.json({
       stats: {
@@ -99,6 +120,8 @@ router.get('/dashboard', authenticate, async (_req: Request, res: Response) => {
         slug: nt.slug,
         count: nt._count.articles,
       })),
+      daily_activity: dailyActivity,
+      articles_this_week: articlesThisWeek,
     });
   } catch (err) {
     console.error('Dashboard error:', err);

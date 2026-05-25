@@ -4,6 +4,7 @@ import { Mail, Linkedin, Twitter } from 'lucide-react';
 import PageNav from '../components/ui/PageNav';
 import { JournalistProfile } from '../types';
 import { apiGetJournalists } from '../lib/api';
+import SeoHead from '../components/seo/SeoHead';
 
 // ── Static fallback team (shown when no journalist profiles have been saved) ──
 const FALLBACK_TEAM: JournalistProfile[] = [
@@ -72,6 +73,7 @@ export default function OurTeamPage() {
       animate={{ opacity: 1 }}
       className="bg-white dark:bg-[#0a0a0a] min-h-screen"
     >
+      <SeoHead title="Our Team" description="Meet the dedicated journalists and staff behind JM News — delivering factual and timely news to Adamawa State." />
       <PageNav label="Our Team" />
       <div className="max-w-7xl mx-auto px-6 py-16 lg:py-24">
         <header className="max-w-3xl mb-16 lg:mb-24">

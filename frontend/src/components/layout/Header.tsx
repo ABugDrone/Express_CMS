@@ -222,6 +222,15 @@ function Header() {
                     {searchQuery.length >= 2 && searchResults.length === 0 && (
                       <p className="px-3 py-3 text-xs text-gray-400 text-center">No results for "{searchQuery}"</p>
                     )}
+                    {searchQuery.length >= 2 && (
+                      <Link
+                        to={`/search?q=${encodeURIComponent(searchQuery)}`}
+                        onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                        className="block px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-600/10 text-center border-t border-gray-100 dark:border-white/5"
+                      >
+                        View all results →
+                      </Link>
+                    )}
                   </div>
                 </motion.div>
               )}

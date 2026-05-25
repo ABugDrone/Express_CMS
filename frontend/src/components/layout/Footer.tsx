@@ -79,7 +79,7 @@ function Footer() {
     <div className="flex flex-col gap-6">
       <h4 className="text-xs font-black uppercase tracking-[0.2em]">Legal</h4>
       <div className="bg-white/5 p-6 border border-white/10">
-        <p className="text-[11px] text-gray-500 leading-relaxed uppercase tracking-widest font-bold mb-4">Jabbamah Menorah Ltd</p>
+        <p className="text-[11px] text-gray-500 leading-relaxed uppercase tracking-widest font-bold mb-4">Toko Academy</p>
         <p className="text-xs text-gray-300 leading-relaxed italic">"We deliver factual and timely news."</p>
       </div>
     </div>
@@ -87,7 +87,7 @@ function Footer() {
 
   const bottomBar = (
     <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase font-bold tracking-[0.2em] text-gray-600">
-      <div>{copyright || '© 2026 Jabbamah Menorah Limited. All rights reserved.'}</div>
+      <div>{copyright || '© 2026 Toko Academy. All rights reserved.'}</div>
       <div className="flex gap-6">
         {quickLinks.filter(l => l.url.startsWith('/privacy') || l.url.startsWith('/tos') || l.url.startsWith('#')).map(l => (
           l.url.startsWith('/') ? (
@@ -103,7 +103,7 @@ function Footer() {
   if (footerStyle === 'minimal') {
     return (
       <footer className="bg-black text-white py-8 px-6 text-center">
-        <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">{copyright || '© 2026 Jabbamah Menorah Limited. All rights reserved.'}</p>
+        <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">{copyright || '© 2026 Toko Academy. All rights reserved.'}</p>
       </footer>
     );
   }

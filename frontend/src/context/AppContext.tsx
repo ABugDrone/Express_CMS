@@ -178,6 +178,8 @@ function syncJournalistProfiles(updatedUser: UserProfile) {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [news, setNews]               = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
+  const [newsPage, setNewsPage] = useState(1);
+  const [newsTotalPages, setNewsTotalPages] = useState(1);
   const newsInitialized               = useRef(false);
 
   const [ads, setAds]                 = useState<Advertisement[]>([]);
@@ -248,6 +250,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await apiGetArticles({ per_page: 20 });
       setNews(res.items.map(articleToNewsItem));
+      setNewsPage(1);
+      setNewsTotalPages(res.total_pages || 1);
     } catch {
       // Backend unreachable
     } finally {
@@ -255,6 +259,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       newsInitialized.current = true;
     }
   }, []);
+
+  const loadMoreNews = useCallback(async () => {
+    const nextPage = newsPage + 1;
+    if (nextPage > newsTotalPages) return;
+    try {
+      const res = await apiGetArticles({ per_page: 20, page: String(nextPage) });
+      setNews(prev => [...prev, ...res.items.map(articleToNewsItem)]);
+      setNewsPage(nextPage);
+    } catch {
+      // Silently fail
+    }
+  }, [newsPage, newsTotalPages]);
 
   const refreshAds = useCallback(async () => {
     if (!adsInitialized.current) setAdsLoading(true);
@@ -467,14 +483,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setStorageSize(getStorageSize());
   }, []);
 
+  const hasMoreNews = newsPage < newsTotalPages;
+
   const contextValue = useMemo(() => ({
-    news, newsLoading, addNews, updateNews, deleteNews, refreshNews,
+    news, newsLoading, addNews, updateNews, deleteNews, refreshNews, loadMoreNews, hasMoreNews,
     ads, adsLoading, addAd, updateAd, deleteAd, getAdsByPlacement, refreshAds,
     user, isAdmin, isStaff, login, logout, updateProfile,
     bannedUserIds, banUser, unbanUser,
     theme, toggleTheme,
     storageSize, clearOldCache,
-  }), [news, newsLoading, addNews, updateNews, deleteNews, refreshNews,
+  }), [news, newsLoading, addNews, updateNews, deleteNews, refreshNews, loadMoreNews, hasMoreNews,
       ads, adsLoading, addAd, updateAd, deleteAd, getAdsByPlacement, refreshAds,
       user, isAdmin, isStaff, login, logout, updateProfile,
       bannedUserIds, banUser, unbanUser,

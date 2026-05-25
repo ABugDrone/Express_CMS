@@ -59,15 +59,7 @@ const generalLimiter = rateLimit({
 });
 app.use('/api/', generalLimiter);
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: false,
-  message: 'Too many login attempts, please try again later.',
-});
-app.use('/api/auth?action=login', loginLimiter);
+
 
 // ── Static Files ─────────────────────────────────────────────────────────────
 app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads'), {
@@ -110,6 +102,19 @@ app.get('/api/sitemap.xml', async (_req, res) => {
     console.error('Sitemap error:', err);
     res.status(500).json({ error: 'Failed to generate sitemap' });
   }
+});
+
+app.get('/robots.txt', (_req, res) => {
+  const baseUrl = env.APP_URL;
+  res.type('text/plain');
+  res.send(`User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /staff
+Disallow: /api
+
+Sitemap: ${baseUrl}/api/sitemap.xml
+`);
 });
 
 app.get('/api/health', (_req, res) => {

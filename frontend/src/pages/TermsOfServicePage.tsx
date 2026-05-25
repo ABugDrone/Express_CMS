@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import PageNav from '../components/ui/PageNav';
+import SeoHead from '../components/seo/SeoHead';
 
 export default function TermsOfServicePage() {
   const sections = [
@@ -35,6 +36,7 @@ export default function TermsOfServicePage() {
       animate={{ opacity: 1 }}
       className="bg-white dark:bg-[#0a0a0a] min-h-screen"
     >
+      <SeoHead title="Terms of Service" description="JM News terms of service — rules and guidelines for using our news platform." />
       <PageNav label="Terms of Service" />
       <div className="max-w-3xl mx-auto px-6 py-16 lg:py-24">
       <header className="mb-16 border-b-2 border-amber-600 pb-4">

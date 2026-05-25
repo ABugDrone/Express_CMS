@@ -4,6 +4,8 @@ import { useMemo, memo } from 'react';
 import AdBanner from '../components/ads/AdBanner';
 import { VideoReel } from '../components/news/VideoReelViewer';
 import { getArticleUrl } from '../lib/urls';
+import SeoHead from '../components/seo/SeoHead';
+import JsonLd, { websiteLd } from '../components/seo/JsonLd';
 
 // ── Shared primitives ──────────────────────────────────────────────
 const AdStrip = memo(function AdStrip({ ad }: { ad: any }) {
@@ -132,7 +134,7 @@ const VideoCard = memo(function VideoCard({ story }: { story: any }) {
 
 // ── Main Page ──────────────────────────────────────────────────────
 export default function HomePage() {
-  const { news, newsLoading, getAdsByPlacement } = useAppContext();
+  const { news, newsLoading, getAdsByPlacement, loadMoreNews, hasMoreNews } = useAppContext();
   const navigate = useNavigate();
 
   const middleAds = getAdsByPlacement('middle');
@@ -175,6 +177,8 @@ export default function HomePage() {
 
   return (
     <div className="bg-white dark:bg-[#0a0a0a] min-h-screen text-gray-900 dark:text-white">
+      <SeoHead title="Home" description="Adamawa's independent voice for news, politics, and culture. We deliver factual and timely news." />
+      <JsonLd data={websiteLd({})} />
 
       {/* Breaking ticker */}
       {breaking.length > 0 && (
@@ -354,6 +358,18 @@ export default function HomePage() {
         <div className="pb-8">
           <VideoReel stories={all.slice(10, 20)} title="Video" />
         </div>
+        )}
+
+        {/* Load More */}
+        {hasMoreNews && (
+          <div className="text-center py-10">
+            <button
+              onClick={loadMoreNews}
+              className="px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black uppercase tracking-widest transition-colors"
+            >
+              Load More Stories
+            </button>
+          </div>
         )}
 
       </div>

@@ -1,6 +1,15 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { prisma } from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+
+const commentPostLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many comments from this IP, please slow down.',
+});
 
 const router = Router();
 
@@ -45,7 +54,7 @@ router.get('/comments', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/comments', async (req: Request, res: Response) => {
+router.post('/comments', commentPostLimiter, async (req: Request, res: Response) => {
   try {
     const { action } = req.query as { action?: string };
 

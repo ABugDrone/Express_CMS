@@ -1,8 +1,17 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
 import { prisma } from '../lib/prisma.js';
 import { signToken, verifyToken } from '../lib/jwt.js';
 import { env } from '../config/env.js';
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many login attempts, please try again later.',
+});
 
 const router = Router();
 
@@ -20,7 +29,7 @@ function serializeUserResponse(user: any, role: string, staffRole: string | null
   };
 }
 
-router.all('/auth', async (req: Request, res: Response) => {
+router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
   try {
     const { action } = req.query as { action: string };
 

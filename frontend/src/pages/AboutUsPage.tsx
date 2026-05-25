@@ -1,10 +1,12 @@
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, CheckCircle2 } from 'lucide-react';
 import PageNav from '../components/ui/PageNav';
+import SeoHead from '../components/seo/SeoHead';
 
 export default function AboutUsPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-[#0a0a0a] min-h-screen">
+      <SeoHead title="About Us" description="Learn about JM News — our mission, vision, and commitment to delivering factual and timely news to Adamawa State and beyond." />
       <PageNav label="About Us" />
       <div className="max-w-4xl mx-auto px-6 py-16 lg:py-24">
       <div className="flex flex-col gap-12">
