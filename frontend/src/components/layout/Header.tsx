@@ -258,7 +258,7 @@ function Header() {
         )}
 
         {headerCfg?.showDarkModeToggle !== false && <ThemeToggle />}
-        <ThemeSwitcher />
+        {isAdmin && <ThemeSwitcher />}
 
         {/* Mobile menu */}
         <button
