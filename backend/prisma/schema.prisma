@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Users & Auth ──────────────────────────────────────────────────────────────
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  email       String   @unique
+  password    String
+  fullName    String?
+  displayName String?
+  bio         String?
+  avatarUrl   String?
+  twitterUrl  String?
+  linkedinUrl String?
+  role        String   @default("staff")
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  articles    Article[]
+  commands    AdminCommand[]
+}
+
+// ── News & Content ────────────────────────────────────────────────────────────
+
+model Article {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String?
+  typeId      Int?
+  authorName  String
+  authorId    Int?
+  imageUrl    String?
+  videoUrl    String?
+  driveUrl    String?
+  tags        String?
+  isFeatured  Boolean  @default(false)
+  isBreaking  Boolean  @default(false)
+  isPublished Boolean  @default(true)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author      User?    @relation(fields: [authorId], references: [id])
+  newsType    NewsType? @relation(fields: [typeId], references: [id], onDelete: SetNull)
+  comments    Comment[]
+}
+
+model Comment {
+  id           Int      @id @default(autoincrement())
+  articleId    Int
+  authorName   String
+  authorEmail  String?
+  authorAvatar String?
+  authorId     String?
+  isAnonymous  Boolean  @default(false)
+  content      String
+  parentId     Int?
+  votes        Int      @default(0)
+  isSpam       Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+}
+
+// ── CMS: News Types (replaces hardcoded categories) ──────────────────────────
+
+model NewsType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  isStandalone Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  articles    Article[]
+}
+
+// ── CMS: Site Branding ───────────────────────────────────────────────────────
+
+model SiteSetting {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String   @default("")
+  type        String   @default("string")
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ── CMS: Social Links ────────────────────────────────────────────────────────
+
+model SocialLink {
+  id          Int      @id @default(autoincrement())
+  platform    String   @unique
+  icon        String
+  url         String
+  label       String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+// ── CMS: Quick Links ─────────────────────────────────────────────────────────
+
+model QuickLink {
+  id          Int      @id @default(autoincrement())
+  label       String
+  url         String
+  group       String   @default("footer")
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([group])
+  @@index([sortOrder])
+}
+
+// ── CMS: Legal Pages ─────────────────────────────────────────────────────────
+
+model LegalPage {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  content     String
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// ── CMS: Contact Info ────────────────────────────────────────────────────────
+
+model ContactInfo {
+  id          Int      @id @default(autoincrement())
+  type        String
+  label       String
+  value       String
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([sortOrder])
+}
+
+// ── CMS: CTA Elements ────────────────────────────────────────────────────────
+
+model CTAElement {
+  id          Int      @id @default(autoincrement())
+  label       String
+  text        String?
+  link        String?
+  placement   String   @default("footer")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([placement])
+  @@index([sortOrder])
+}
+
+// ── CMS: Generic Page Elements (full CMS customization) ──────────────────────
+
+model PageElement {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  type        String
+  placement   String
+  content     String
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([placement])
+  @@index([key])
+}
+
+// ── CMS: Admin Command Log ───────────────────────────────────────────────────
+
+model AdminCommand {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  action      String
+  target      String
+  data        String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ── Advertisements ───────────────────────────────────────────────────────────
+
+model Advertisement {
+  id          Int      @id @default(autoincrement())
+  title       String
+  type        String   @default("static_image")
+  placement   String   @default("top")
+  imageUrl    String?
+  bannerUrl   String?
+  videoUrl    String?
+  videoFile   String?
+  redirectUrl String?
+  adsenseCode String?
+  isPaid      Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  startDate   String?
+  endDate     String?
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ── Banned Users ─────────────────────────────────────────────────────────────
+
+model BannedUser {
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique
+  reason    String?
+  bannedAt  DateTime @default(now())
+}
+
+// ── Themes ───────────────────────────────────────────────────────────────────
+
+model Theme {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  version     String   @default("1.0.0")
+  cssContent  String   @default("") @db.Text
+  isActive    Boolean  @default(false)
+  isPremium   Boolean  @default(false)
+  previewUrl  String?
+  author      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
