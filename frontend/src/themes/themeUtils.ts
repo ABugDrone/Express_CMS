@@ -22,17 +22,6 @@ export function applyThemeVariables(theme: Theme): void {
       .concat(`theme-${theme.slug}`)
       .join(' ');
   }
-
-  // Auto-toggle dark mode based on theme background luminance
-  const bg = theme.colors?.background;
-  if (bg) {
-    const hex = bg.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    document.documentElement.classList.toggle('dark', luminance < 0.5);
-  }
 }
 
 /**
