@@ -234,6 +234,10 @@ router.post('/articles', authenticate, async (req: Request, res: Response) => {
       res.status(400).json({ error: 'Title too long (max 300 characters)' });
       return;
     }
+    if (!content || content.trim().split(/\s+/).filter(Boolean).length < 1500) {
+      res.status(400).json({ error: 'Content must be at least 1500 words' });
+      return;
+    }
 
     // Validate category_id if provided
     let typeId = null;
@@ -317,6 +321,10 @@ router.put('/articles', authenticate, async (req: Request, res: Response) => {
         res.status(400).json({ error: 'Title must be 2-300 characters' });
         return;
       }
+    }
+    if (content !== undefined && content.trim().split(/\s+/).filter(Boolean).length < 1500) {
+      res.status(400).json({ error: 'Content must be at least 1500 words' });
+      return;
     }
 
     let slug = existing.slug;
