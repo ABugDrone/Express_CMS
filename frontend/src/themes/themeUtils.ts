@@ -12,7 +12,7 @@ export function applyThemeVariables(theme: Theme): void {
   if (theme.colors) applyColorVariables(root, theme.colors);
   if (theme.typography) applyTypographyVariables(root, theme.typography);
   if (theme.layout) applyLayoutVariables(root, theme.layout);
-  if (theme.cssContent !== undefined) applyCustomCSS(theme.cssContent, theme.slug);
+  applyCustomCSS(theme.cssContent ?? '', theme.slug);
 
   // Add theme class to body
   if (theme.slug) {
@@ -113,14 +113,73 @@ function applyCustomCSS(cssContent: string, themeSlug: string): void {
     existingStyle.remove();
   }
 
+  // Build CSS that overrides Tailwind's utility classes to use theme variables.
+  // This lets bg-white, text-gray-900, border-gray-200 etc. respond to theme changes
+  // without touching any component code.
+  const themeColors = (document.documentElement.style as any);
+  const bg = themeColors.getPropertyValue('--color-background')?.trim() || '#ffffff';
+  const text = themeColors.getPropertyValue('--color-text')?.trim() || '#111827';
+  const textMuted = themeColors.getPropertyValue('--color-text-muted')?.trim() || '#6b7280';
+  const primary = themeColors.getPropertyValue('--color-primary')?.trim() || '#d97706';
+  const border = themeColors.getPropertyValue('--color-border')?.trim() || '#e5e7eb';
+  const bgAlt = themeColors.getPropertyValue('--color-background-alt')?.trim() || '#f9fafb';
+  const bgDark = themeColors.getPropertyValue('--color-background-dark')?.trim() || '#111827';
+
+  const generatedCSS = `
+    /* Theme: ${themeSlug} — auto-generated Tailwind overrides */
+    
+    /* Background overrides — make bg-white / dark:bg-* use theme background */
+    [class*="bg-white"] { background-color: var(--color-background, #fff) !important; }
+    .dark [class*="bg-white"] { background-color: var(--color-background, #fff) !important; }
+    [class*="dark\\:bg-"][class*="white"], .dark [class*="dark\\:bg-\\["] {
+      background-color: var(--color-background, #fff) !important;
+    }
+    
+    /* Override common hardcoded dark backgrounds */
+    [class*="dark\\:bg-\\[\\#0a0a0a\\]"], [class*="dark\\:bg-\\[\\#0f0f0f\\]"] {
+      background-color: var(--color-background, #0a0a0a) !important;
+    }
+    .dark [class*="dark\\:bg-black"] { background-color: var(--color-background, #000) !important; }
+    
+    /* Text overrides */
+    body { color: var(--color-text, #111827) !important; }
+    [class*="text-gray-900"] { color: var(--color-text, #111827) !important; }
+    [class*="dark\\:text-white"] { color: var(--color-text-inverse, #fff) !important; }
+    [class*="text-gray-700"] { color: var(--color-text, #111827) !important; }
+    [class*="text-gray-800"] { color: var(--color-text, #111827) !important; }
+    [class*="text-gray-600"] { color: var(--color-text-muted, #6b7280) !important; }
+    [class*="text-gray-500"] { color: var(--color-text-muted, #6b7280) !important; }
+    [class*="text-gray-400"] { color: var(--color-text-light, #9ca3af) !important; }
+    
+    /* Border overrides */
+    [class*="border-gray-200"] { border-color: var(--color-border, #e5e7eb) !important; }
+    [class*="border-gray-100"] { border-color: var(--color-border-light, #f3f4f6) !important; }
+    
+    /* Amber/primary overrides — use theme primary color */
+    [class*="text-amber-600"] { color: var(--color-primary, #d97706) !important; }
+    [class*="bg-amber-600"] { background-color: var(--color-primary, #d97706) !important; }
+    [class*="hover\\:text-amber-600"]:hover { color: var(--color-primary-hover, #d97706) !important; }
+    [class*="hover\\:bg-amber-700"]:hover { background-color: var(--color-primary-dark, #b45309) !important; }
+    [class*="border-amber-600"] { border-color: var(--color-primary, #d97706) !important; }
+    [class*="bg-amber-50"] { background-color: var(--color-primary-light, #fef3c7) !important; }
+    
+    /* Badge/tag/category backgrounds */
+    [class*="bg-gray-100"] { background-color: var(--color-background-alt, #f3f4f6) !important; }
+    [class*="bg-gray-50"] { background-color: var(--color-background-alt, #f3f4f6) !important; }
+    
+    /* Footer dark area */
+    [class*="bg-black"] { background-color: var(--color-background-dark, #111827) !important; }
+    [class*="bg-\\[\\#0f172a\\]"] { background-color: var(--color-background-dark, #0f172a) !important; }
+  `;
+
+  const combinedCSS = generatedCSS + (cssContent || '');
+
   // Create new style tag
-  if (cssContent) {
-    const style = document.createElement('style');
-    style.id = 'theme-custom-css';
-    style.setAttribute('data-theme', themeSlug);
-    style.textContent = cssContent;
-    document.head.appendChild(style);
-  }
+  const style = document.createElement('style');
+  style.id = 'theme-custom-css';
+  style.setAttribute('data-theme', themeSlug);
+  style.textContent = combinedCSS;
+  document.head.appendChild(style);
 }
 
 /**
