@@ -142,7 +142,7 @@ export default function HomePage() {
   // Show spinner only on the very first load (no data yet)
   if (news.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#0a0a0a] min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-background, #ffffff)' }}>
         {newsLoading ? (
           <div className="flex flex-col items-center gap-4 text-gray-400">
             <div className="w-10 h-10 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
@@ -176,7 +176,11 @@ export default function HomePage() {
   if (!featured) return null;
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] min-h-screen text-gray-900 dark:text-white">
+    <div className="min-h-screen"
+      style={{
+        backgroundColor: 'var(--color-background, #ffffff)',
+        color: 'var(--color-text, #111827)',
+      }}>
       <SeoHead title="Home" description="Adamawa's independent voice for news, politics, and culture. We deliver factual and timely news." />
       <JsonLd data={websiteLd({})} />
 

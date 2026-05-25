@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { uniqueSlug } from '../lib/slug.js';
+import { cache } from '../lib/cache.js';
 
 const router = Router();
 
@@ -222,6 +223,7 @@ router.post('/themes/:id/activate', authenticate, requireAdmin, async (req: Requ
       data: { isActive: true } 
     });
 
+    cache.del('config');
     res.json({ theme: parseTheme(raw), message: 'Theme activated successfully' });
   } catch (err) {
     console.error('Theme activate error:', err);

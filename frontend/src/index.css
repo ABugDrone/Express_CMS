@@ -21,25 +21,25 @@
 
 @layer base {
   :root {
-    --primary: #D97706;
-    --primary-dark: #92400E;
-    --bg: #ffffff;
-    --surface: #ffffff;
-    --text: #111827;
-    --text-light: #6B7280;
-    --shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.15);
-    --neutral-dark: #0F172A;
+    --primary: var(--color-primary, #D97706);
+    --primary-dark: var(--color-primary-dark, #92400E);
+    --bg: var(--color-background, #ffffff);
+    --surface: var(--color-background-alt, #ffffff);
+    --text: var(--color-text, #111827);
+    --text-light: var(--color-text-muted, #6B7280);
+    --shadow: var(--shadow-default, 0 10px 25px -5px rgba(217, 119, 6, 0.15));
+    --neutral-dark: var(--color-background-dark, #0F172A);
   }
 
   html.dark {
-    --primary: #FBBF24;
-    --primary-dark: #D97706;
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --text: #F9FAFB;
-    --text-light: #9CA3AF;
-    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    --neutral-dark: #0F172A;
+    --primary: var(--color-primary, #FBBF24);
+    --primary-dark: var(--color-primary-dark, #D97706);
+    --bg: var(--color-background, #0a0a0a);
+    --surface: var(--color-background-alt, #141414);
+    --text: var(--color-text, #F9FAFB);
+    --text-light: var(--color-text-muted, #9CA3AF);
+    --shadow: var(--shadow-default, 0 10px 25px -5px rgba(0, 0, 0, 0.5));
+    --neutral-dark: var(--color-background-dark, #0F172A);
   }
 
   * {
@@ -47,13 +47,13 @@
   }
 
   html, body {
-    background-color: #ffffff !important;
-    color: #111827 !important;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-text, #111827);
   }
 
   html.dark, html.dark body {
-    background-color: #0a0a0a !important;
-    color: #F9FAFB !important;
+    background-color: var(--color-background, #0a0a0a);
+    color: var(--color-text, #F9FAFB);
   }
 
   body {

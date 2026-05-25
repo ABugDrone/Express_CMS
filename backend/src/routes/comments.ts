@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { prisma } from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+import { wsManager } from '../lib/websocket.js';
+import { env } from '../config/env.js';
 
 const commentPostLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -114,6 +116,15 @@ router.post('/comments', commentPostLimiter, async (req: Request, res: Response)
         parentId,
       },
     });
+
+    if (env.WS_ENABLED) {
+      wsManager.notifyNewComment(Number(article_id), {
+        id: comment.id,
+        author: comment.authorName,
+        content: comment.content.slice(0, 100),
+        createdAt: comment.createdAt.toISOString(),
+      });
+    }
 
     res.status(201).json(comment);
   } catch (err) {

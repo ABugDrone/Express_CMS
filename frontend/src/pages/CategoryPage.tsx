@@ -82,7 +82,8 @@ export default function CategoryPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white dark:bg-[#0a0a0a] min-h-screen"
+      className="min-h-screen"
+      style={{ backgroundColor: 'var(--color-background, #ffffff)', color: 'var(--color-text, #111827)' }}
     >
       <SeoHead title={categoryName} description={`Latest ${categoryName} news and updates`} />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">

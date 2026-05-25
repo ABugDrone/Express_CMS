@@ -102,7 +102,8 @@ function Header() {
   }, [isSearchOpen]);
 
   const topBar = !isMinimal && (
-    <div className="hidden md:flex justify-between items-center px-6 lg:px-10 py-2 border-b border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f0f0f]">
+    <div className="hidden md:flex justify-between items-center px-6 lg:px-10 py-2 border-b border-gray-100 dark:border-white/5"
+      style={{ backgroundColor: 'var(--color-background-alt, #ffffff)', borderBottomColor: 'var(--color-border-light, #f3f4f6)' }}>
       <LiveClock />
       {headerCfg?.showSocial !== false && (
         <div className="flex items-center gap-3">
@@ -130,9 +131,11 @@ function Header() {
   const mainBar = (
     <div className={cn(
       "flex items-center px-4 lg:px-8 h-16 md:h-20 transition-all duration-300",
-      isModern ? 'bg-[#0f172a] dark:bg-black' : 'bg-white dark:bg-[#0f0f0f]',
       isScrolled ? "h-14 shadow-md shadow-amber-600/5" : ""
-    )}>
+    )}
+    style={{
+      backgroundColor: isModern ? 'var(--color-background-dark, #0f172a)' : 'var(--color-background, #ffffff)',
+    }}>
 
       {/* Left: Logo */}
       <div className="flex items-center gap-3 flex-shrink-0">
@@ -271,9 +274,13 @@ function Header() {
   return (
     <header className={cn(
       "w-full border-b",
-      isModern ? 'border-b-0 bg-[#0f172a] dark:bg-black' : 'bg-white dark:bg-[#0f0f0f] border-gray-200 dark:border-amber-600/20',
+      isModern ? 'border-b-0' : 'border-gray-200 dark:border-amber-600/20',
       headerCfg?.sticky !== false ? 'sticky top-0 z-50' : 'relative'
-    )}>
+    )}
+    style={{
+      backgroundColor: isModern ? 'var(--color-background-dark, #0f172a)' : 'var(--color-background, #ffffff)',
+      borderBottomColor: 'var(--color-border, #e5e7eb)',
+    }}>
       {topBar}
       {mainBar}
       {!isMinimal && (
@@ -290,7 +297,8 @@ function Header() {
             <motion.div
               initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 w-full max-w-xs bg-white dark:bg-[#0f0f0f] z-[70] shadow-2xl flex flex-col border-r border-amber-600/20"
+              className="fixed inset-y-0 left-0 w-full max-w-xs z-[70] shadow-2xl flex flex-col border-r border-amber-600/20"
+              style={{ backgroundColor: 'var(--color-background, #ffffff)' }}
             >
               <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5">
                 <Logo />

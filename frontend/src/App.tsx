@@ -8,9 +8,11 @@ import { useAppContext } from './context/AppContext';
 import { ThemeProvider } from './themes/ThemeProvider';
 import { getDefaultTheme } from './themes/presets';
 import ThemeLoader from './themes/ThemeLoader';
-import { useEffect, useRef, lazy, Suspense } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense, useCallback } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from './components/ui/ErrorBoundary';
+import { useWebSocket } from './lib/useWebSocket';
+import BreakingNewsBanner from './components/news/BreakingNewsBanner';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const ArticlePage = lazy(() => import('./pages/ArticlePage'));
@@ -39,6 +41,13 @@ function AppContent() {
   const { getAdsByPlacement } = useAppContext();
   const topAds = getAdsByPlacement('top');
   const adRef = useRef<HTMLDivElement>(null);
+  const [breakingArticle, setBreakingArticle] = useState<{ id: number; title: string; slug: string; excerpt?: string } | null>(null);
+
+  const onBreakingNews = useCallback((article: { id: number; title: string; slug: string; excerpt: string }) => {
+    setBreakingArticle(article);
+  }, []);
+
+  useWebSocket({ onBreakingNews });
 
   const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/staff');
 
@@ -64,7 +73,11 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] font-sans text-gray-900 dark:text-white">
+    <div className="min-h-screen font-sans"
+      style={{
+        backgroundColor: 'var(--color-background, #ffffff)',
+        color: 'var(--color-text, #111827)',
+      }}>
 
       {/* Top Ad Banner - scrolls away naturally */}
       <div ref={adRef} className="w-full bg-gray-50 dark:bg-[#111] border-b border-gray-200 dark:border-white/5">
@@ -83,6 +96,7 @@ function AppContent() {
         </div>
       </div>
 
+      <BreakingNewsBanner article={breakingArticle} onDismiss={() => setBreakingArticle(null)} />
       <Header />
 
       <Suspense fallback={<LoadingFallback />}>

@@ -2,8 +2,18 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { uniqueSlug } from '../lib/slug.js';
+import { cache, TTL, cacheKey } from '../lib/cache.js';
+import { wsManager } from '../lib/websocket.js';
+import { env } from '../config/env.js';
 
 const router = Router();
+
+function invalidateArticleCache(articleId?: number) {
+  cache.del(cacheKey('articles', 'list'));
+  if (articleId) {
+    cache.del(cacheKey('article', String(articleId)));
+  }
+}
 
 const articleSelect = {
   id: true,
@@ -73,7 +83,14 @@ router.get('/articles', async (req: Request, res: Response) => {
       slug,
     } = req.query as Record<string, string>;
 
+    // Single article by ID
     if (id) {
+      const cacheKey_id = cacheKey('article', id);
+      const cachedArticle = cache.get<any>(cacheKey_id);
+      if (cachedArticle) {
+        res.json(cachedArticle);
+        return;
+      }
       const articleId = safeParseInt(id);
       if (!articleId) {
         res.status(400).json({ error: 'Valid article ID is required' });
@@ -100,14 +117,22 @@ router.get('/articles', async (req: Request, res: Response) => {
         res.status(404).json({ error: 'Article not found' });
         return;
       }
-      res.json({
+      const response = {
         ...serializeArticle(article),
         comments: article.comments,
-      });
+      };
+      cache.set(cacheKey('article', id), response, TTL.ARTICLES);
+      res.json(response);
       return;
     }
 
     if (slug) {
+      const cacheKey_slug = cacheKey('article', 'slug', slug);
+      const cachedSlug = cache.get<any>(cacheKey_slug);
+      if (cachedSlug) {
+        res.json(cachedSlug);
+        return;
+      }
       const article = await prisma.article.findUnique({
         where: { slug },
         include: { 
@@ -129,10 +154,12 @@ router.get('/articles', async (req: Request, res: Response) => {
         res.status(404).json({ error: 'Article not found' });
         return;
       }
-      res.json({
+      const slugResponse = {
         ...serializeArticle(article),
         comments: article.comments,
-      });
+      };
+      cache.set(cacheKey('article', 'slug', slug), slugResponse, TTL.ARTICLES);
+      res.json(slugResponse);
       return;
     }
 
@@ -157,6 +184,14 @@ router.get('/articles', async (req: Request, res: Response) => {
       ];
     }
 
+    // Cache list results by query params
+    const listCacheKey = cacheKey('articles', 'list', JSON.stringify({ page, limit, category, featured, breaking }));
+    const cachedList = cache.get<{ items: any[]; total: number; page: number; total_pages: number }>(listCacheKey);
+    if (cachedList && !search) {
+      res.json(cachedList);
+      return;
+    }
+
     const [items, total] = await Promise.all([
       prisma.article.findMany({
         where,
@@ -168,12 +203,18 @@ router.get('/articles', async (req: Request, res: Response) => {
       prisma.article.count({ where }),
     ]);
 
-    res.json({
+    const listResponse = {
       items: items.map(serializeArticle),
       total,
       page: pageNum,
       total_pages: Math.ceil(total / limitNum),
-    });
+    };
+
+    if (!search) {
+      cache.set(listCacheKey, listResponse, TTL.ARTICLES_LIST);
+    }
+
+    res.json(listResponse);
   } catch (err) {
     console.error('Articles list error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -225,6 +266,18 @@ router.post('/articles', authenticate, async (req: Request, res: Response) => {
         isBreaking: is_breaking === true || is_breaking === 1,
       },
     });
+
+    invalidateArticleCache();
+
+    // Push breaking news via WebSocket
+    if (env.WS_ENABLED && (is_breaking === true || is_breaking === 1)) {
+      wsManager.notifyBreakingNews({
+        id: article.id,
+        title: article.title,
+        slug: article.slug,
+        excerpt: article.excerpt,
+      });
+    }
 
     res.status(201).json({ id: article.id, slug: article.slug });
   } catch (err) {
@@ -306,6 +359,7 @@ router.put('/articles', authenticate, async (req: Request, res: Response) => {
       },
     });
 
+    invalidateArticleCache(articleId);
     res.json(serializeArticle({ ...article, newsType: existing.newsType }));
   } catch (err) {
     console.error('Article update error:', err);
@@ -322,6 +376,7 @@ router.delete('/articles', authenticate, async (req: Request, res: Response) => 
     }
 
     await prisma.article.delete({ where: { id: articleId } });
+    invalidateArticleCache(articleId);
     res.json({ message: 'Article deleted' });
   } catch (err) {
     console.error('Article delete error:', err);

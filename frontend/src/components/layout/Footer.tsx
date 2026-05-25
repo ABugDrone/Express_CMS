@@ -100,20 +100,22 @@ function Footer() {
     </div>
   );
 
+  const footerBg = { backgroundColor: 'var(--color-background-dark, #000000)', color: 'var(--color-text-inverse, #ffffff)' };
+
   if (footerStyle === 'minimal') {
     return (
-      <footer className="bg-black text-white py-8 px-6 text-center">
-        <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">{copyright || '© 2026 Toko Academy. All rights reserved.'}</p>
+      <footer className="pt-16 pb-8 px-6 text-center" style={footerBg}>
+        <p className="text-[10px] uppercase font-bold tracking-widest" style={{ color: 'var(--color-text-muted, #6b7280)' }}>{copyright || '© 2026 Toko Academy. All rights reserved.'}</p>
       </footer>
     );
   }
 
   if (footerStyle === 'centered') {
     return (
-      <footer className="bg-black text-white pt-12 pb-8 px-6 text-center">
+      <footer className="pt-16 pb-8 px-6 text-center" style={footerBg}>
         <div className="max-w-lg mx-auto flex flex-col items-center gap-6">
           <Logo variant="light" />
-          <p className="text-gray-400 text-sm leading-relaxed">Adamawa's independent voice for news, politics, and culture.</p>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-muted, #9ca3af)' }}>Adamawa's independent voice for news, politics, and culture.</p>
           {cfg?.showSocial !== false && socials.length > 0 && (
             <div className="flex gap-4">
               {socials.map(s => (
@@ -124,7 +126,7 @@ function Footer() {
               ))}
             </div>
           )}
-          <div className="flex gap-4 text-xs text-gray-400">
+          <div className="flex gap-4 text-xs" style={{ color: 'var(--color-text-muted, #9ca3af)' }}>
             {adminPortals}
             {staffPortals}
           </div>
@@ -136,10 +138,10 @@ function Footer() {
 
   if (footerStyle === 'simple') {
     return (
-      <footer className="bg-black text-white pt-12 pb-8 px-6 md:px-12">
+      <footer className="pt-16 pb-8 px-6 md:px-12" style={footerBg}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <Logo variant="light" />
-          <div className="flex gap-4 text-xs text-gray-400">
+          <div className="flex gap-4 text-xs" style={{ color: 'var(--color-text-muted, #9ca3af)' }}>
             {adminPortals}
             {staffPortals}
           </div>
@@ -147,7 +149,8 @@ function Footer() {
             <div className="flex gap-3">
               {socials.map(s => (
                 <a key={s.platform} href={s.url} target="_blank" rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-white transition-colors">
+                  className="hover:text-white transition-colors"
+                  style={{ color: 'var(--color-text-muted, #6b7280)' }}>
                   {socialIcon(s.platform, 'w-4 h-4')}
                 </a>
               ))}
@@ -161,7 +164,7 @@ function Footer() {
 
   // multi-column (default)
   return (
-    <footer className="bg-black text-white pt-16 pb-8 px-6 md:px-12 lg:px-20">
+    <footer className="pt-16 pb-8 px-6 md:px-12 lg:px-20" style={footerBg}>
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20">
 
         {/* Brand */}

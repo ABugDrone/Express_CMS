@@ -113,7 +113,7 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-[#0a0a0a] min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center" style={{ backgroundColor: 'var(--color-background, #ffffff)' }}>
         <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -121,7 +121,7 @@ export default function ArticlePage() {
 
   if (!story) {
     return (
-      <div className="bg-white dark:bg-[#0a0a0a] min-h-[60vh] flex flex-col items-center justify-center p-10 text-center">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-10 text-center" style={{ backgroundColor: 'var(--color-background, #ffffff)' }}>
         <span className="bg-amber-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 mb-4">404</span>
         <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-3">Story Not Found</h2>
         <p className="text-gray-500 mb-6 text-sm">This article may have been moved or deleted.</p>
@@ -140,7 +140,7 @@ export default function ArticlePage() {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background, #ffffff)', color: 'var(--color-text, #111827)' }}>
       <SeoHead
         title={story.title}
         description={story.excerpt}

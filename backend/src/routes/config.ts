@@ -1,9 +1,16 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma.js';
+import { cache, TTL, cacheKey } from '../lib/cache.js';
 
 const router = Router();
 
 router.get('/config', async (_req: Request, res: Response) => {
+  const cached = cache.get('config');
+  if (cached) {
+    res.json(cached);
+    return;
+  }
+
   try {
     const [activeTheme, settings, socials, newsTypes] = await Promise.all([
       prisma.theme.findFirst({ where: { isActive: true } }),
@@ -33,7 +40,7 @@ router.get('/config', async (_req: Request, res: Response) => {
       }
     }
 
-    res.json({
+    const response = {
       site_name: settingsMap.site_name || 'JM News',
       site_description: settingsMap.site_description || '',
       logo_url: settingsMap.logo_url || '',
@@ -43,7 +50,10 @@ router.get('/config', async (_req: Request, res: Response) => {
       theme: themeConfig,
       socials: socials.map(s => ({ platform: s.platform, url: s.url, icon: s.icon })),
       categories: newsTypes.map(n => ({ id: n.id, name: n.name, slug: n.slug })),
-    });
+    };
+
+    cache.set('config', response, TTL.CONFIG);
+    res.json(response);
   } catch (err) {
     console.error('Config error:', err);
     res.status(500).json({ error: 'Internal server error' });
