@@ -82,9 +82,6 @@ export default function AdminNewsTypes({ editId: urlEditId, action: urlAction }:
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">News Types</h2>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Manage standalone news categories. Articles reference these types.</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700">
-          <Plus className="w-4 h-4" /> Add Type
-        </button>
       </div>
 
       {message && <div className="p-3 rounded-lg text-sm font-bold bg-green-50 text-green-700 border border-green-200">{message}</div>}
@@ -104,8 +101,8 @@ export default function AdminNewsTypes({ editId: urlEditId, action: urlAction }:
             <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <input type="checkbox" checked={form.is_standalone === 1} onChange={e => setForm(p => ({ ...p, is_standalone: e.target.checked ? 1 : 0 }))} className="rounded" /> Standalone
             </label>
-            <button onClick={handleSubmit} className="flex items-center gap-2 px-3 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700"><Save className="w-4 h-4" /> Save</button>
-            {editing?.id && <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-white/15"><X className="w-4 h-4" /> Cancel</button>}
+            <button onClick={handleSubmit} className="flex items-center gap-2 px-3 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700"><Save className="w-4 h-4" /> {editing?.id ? 'Update' : 'Save'}</button>
+            <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-white/15"><X className="w-4 h-4" /> Cancel</button>
           </div>
         </div>
       )}

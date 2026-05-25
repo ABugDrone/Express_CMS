@@ -82,34 +82,30 @@ export default function AdminPageElements() {
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Page Elements (CMD)</h2>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Command-style customization. Add any element to any placement on the site.</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700">
-          <Plus className="w-4 h-4" /> Add Element
-        </button>
       </div>
 
       {message && <div className="p-3 rounded-lg text-sm font-bold bg-green-50 text-green-700 border border-green-200">{message}</div>}
 
-      {(editing === null) && (
-        <div className="p-4 border border-gray-200 dark:border-white/10 rounded-lg space-y-3 bg-gray-50 dark:bg-white/5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <input type="text" value={form.key} onChange={e => setForm(p => ({ ...p, key: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').slice(0, 50) }))} placeholder="Unique key (e.g. hero-banner)" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
-            <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white">
-              {ELEMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
-            <select value={form.placement} onChange={e => setForm(p => ({ ...p, placement: e.target.value }))} className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white">
-              {PLACEMENTS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-            <input type="number" value={form.sort_order} onChange={e => setForm(p => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))} placeholder="Order" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
-          </div>
-          <textarea value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} placeholder="Element content (HTML, text, URL, embed code, etc.)" rows={4} className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white font-mono resize-none" />
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-              <input type="checkbox" checked={form.is_active === 1} onChange={e => setForm(p => ({ ...p, is_active: e.target.checked ? 1 : 0 }))} className="rounded" /> Active
-            </label>
-            <button onClick={handleSubmit} className="flex items-center gap-2 px-3 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700"><Save className="w-4 h-4" /> Save</button>
-          </div>
+      <div className="p-4 border border-gray-200 dark:border-white/10 rounded-lg space-y-3 bg-gray-50 dark:bg-white/5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <input type="text" value={form.key} onChange={e => setForm(p => ({ ...p, key: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').slice(0, 50) }))} placeholder="Unique key (e.g. hero-banner)" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
+          <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white">
+            {ELEMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+          <select value={form.placement} onChange={e => setForm(p => ({ ...p, placement: e.target.value }))} className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white">
+            {PLACEMENTS.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <input type="number" value={form.sort_order} onChange={e => setForm(p => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))} placeholder="Order" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
         </div>
-      )}
+        <textarea value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} placeholder="Element content (HTML, text, URL, embed code, etc.)" rows={4} className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white font-mono resize-none" />
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" checked={form.is_active === 1} onChange={e => setForm(p => ({ ...p, is_active: e.target.checked ? 1 : 0 }))} className="rounded" /> Active
+          </label>
+          <button onClick={handleSubmit} className="flex items-center gap-2 px-3 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700"><Save className="w-4 h-4" /> {editing?.id ? 'Update' : 'Save'}</button>
+          <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-white/15"><X className="w-4 h-4" /></button>
+        </div>
+      </div>
 
       {/* Grouped by placement */}
       {Array.from(new Set(elements.map(e => e.placement))).map(placement => (

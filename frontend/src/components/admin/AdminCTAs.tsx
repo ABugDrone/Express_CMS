@@ -82,32 +82,30 @@ export default function AdminCTAs({ editId: urlEditId }: AdminCTAsProps) {
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Call-to-Action Elements</h2>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Manage CTA buttons, banners, and promotional elements</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700">
-          <Plus className="w-4 h-4" /> Add CTA
-        </button>
       </div>
 
       {message && <div className="p-3 rounded-lg text-sm font-bold bg-green-50 text-green-700 border border-green-200">{message}</div>}
 
-      {(editing === null) && (
-        <div className="p-4 border border-gray-200 dark:border-white/10 rounded-lg space-y-3 bg-gray-50 dark:bg-white/5">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <input type="text" value={form.label} onChange={e => setForm(p => ({ ...p, label: e.target.value }))} placeholder="Label" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
-            <input type="text" value={form.text} onChange={e => setForm(p => ({ ...p, text: e.target.value }))} placeholder="Description text" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
-            <input type="url" value={form.link} onChange={e => setForm(p => ({ ...p, link: e.target.value }))} placeholder="Target URL" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <select value={form.placement} onChange={e => setForm(p => ({ ...p, placement: e.target.value }))} className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white">
-              {PLACEMENTS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-            <input type="number" value={form.sort_order} onChange={e => setForm(p => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))} placeholder="Order" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-              <input type="checkbox" checked={form.is_active === 1} onChange={e => setForm(p => ({ ...p, is_active: e.target.checked ? 1 : 0 }))} className="rounded" /> Active
-            </label>
-            <button onClick={handleSubmit} className="flex items-center justify-center gap-2 px-3 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700"><Save className="w-4 h-4" /> Save</button>
+      <div className="p-4 border border-gray-200 dark:border-white/10 rounded-lg space-y-3 bg-gray-50 dark:bg-white/5">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <input type="text" value={form.label} onChange={e => setForm(p => ({ ...p, label: e.target.value }))} placeholder="Label" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
+          <input type="text" value={form.text} onChange={e => setForm(p => ({ ...p, text: e.target.value }))} placeholder="Description text" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
+          <input type="url" value={form.link} onChange={e => setForm(p => ({ ...p, link: e.target.value }))} placeholder="Target URL" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <select value={form.placement} onChange={e => setForm(p => ({ ...p, placement: e.target.value }))} className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white">
+            {PLACEMENTS.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <input type="number" value={form.sort_order} onChange={e => setForm(p => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))} placeholder="Order" className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-white/5 text-sm text-gray-900 dark:text-white" />
+          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" checked={form.is_active === 1} onChange={e => setForm(p => ({ ...p, is_active: e.target.checked ? 1 : 0 }))} className="rounded" /> Active
+          </label>
+          <div className="flex items-center gap-2">
+            <button onClick={handleSubmit} className="flex items-center justify-center gap-2 px-3 py-2 bg-amber-600 text-white text-sm font-bold rounded-lg hover:bg-amber-700"><Save className="w-4 h-4" /> {editing?.id ? 'Update' : 'Save'}</button>
+            <button onClick={() => { setEditing(null); setForm(emptyForm); }} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-white/10 text-sm font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-white/15"><X className="w-4 h-4" /></button>
           </div>
         </div>
-      )}
+      </div>
 
       <div className="space-y-2">
         {ctas.map(c => (
