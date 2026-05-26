@@ -10,7 +10,8 @@ interface LogoProps {
 
 const Logo = memo(function Logo({ className, variant = 'dark' }: LogoProps) {
   const isBrandDark = variant === 'dark';
-  const logoUrl = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23D97706' stroke='%23DC2626' stroke-width='4'/><text x='50' y='58' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' text-anchor='middle' fill='white'>JM</text></svg>`;
+  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23d97706"/><text x="50" y="68" font-family="Arial Black,sans-serif" font-size="48" font-weight="900" text-anchor="middle" fill="%23ffffff">JM</text></svg>`;
+  const logoUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logoSvg)}`;
 
   return (
     <Link to="/" className={cn("flex items-center gap-3 select-none cursor-pointer group/logo", className)}>

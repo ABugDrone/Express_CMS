@@ -16,7 +16,7 @@ export default function AboutUsPage() {
             "About JM News"
           </h1>
           <p className="text-vibrant-text-light mt-8 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
-            Jabbamah Menorah News was founded with a singular purpose: to bridge the information gap in Northern Nigeria through fearless, factual, and timely journalism.
+            JM News was founded with a singular purpose: to bridge the information gap in Northern Nigeria through fearless, factual, and timely journalism.
           </p>
         </header>
 

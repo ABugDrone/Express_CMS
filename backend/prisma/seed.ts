@@ -54,7 +54,7 @@ async function main() {
     { key: 'site_email', value: 'info@jmnews.com', type: 'email', description: 'Contact email' },
     { key: 'site_phone', value: '+234 XXX XXX XXXX', type: 'phone', description: 'Contact phone' },
     { key: 'site_address', value: 'Abuja, Nigeria', type: 'text', description: 'Physical address' },
-    { key: 'footer_copyright', value: '© 2026 Jabbamah Menorah Limited. All rights reserved.', type: 'text', description: 'Footer copyright text' },
+    { key: 'footer_copyright', value: '© 2026 Toko Technologies. All rights reserved.', type: 'text', description: 'Footer copyright text' },
     { key: 'newsletter_title', value: 'JM Brief', type: 'string', description: 'Newsletter section title' },
     { key: 'newsletter_description', value: 'Daily news to your inbox.', type: 'string', description: 'Newsletter description' },
     { key: 'whatsapp_channel_url', value: 'https://whatsapp.com/channel/0029VbAvBF50lwgzHxehLm3l', type: 'url', description: 'WhatsApp channel link' },

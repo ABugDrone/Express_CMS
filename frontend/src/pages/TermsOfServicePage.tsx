@@ -10,7 +10,7 @@ export default function TermsOfServicePage() {
     },
     {
       title: "2. Intellectual Property",
-      content: "All content on JM News, including text, graphics, logos, and images, is the property of Jabbamah Menorah Limited or its content suppliers and is protected by Nigerian and international copyright laws. Reproduction, distribution, or unauthorized use of any material without express written consent is strictly prohibited."
+      content: "All content on JM News, including text, graphics, logos, and images, is the property of Toko Technologies or its content suppliers and is protected by Nigerian and international copyright laws. Reproduction, distribution, or unauthorized use of any material without express written consent is strictly prohibited."
     },
     {
       title: "3. User Conduct",

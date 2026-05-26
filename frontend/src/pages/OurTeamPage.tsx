@@ -19,7 +19,7 @@ const FALLBACK_TEAM: JournalistProfile[] = [
   {
     display_name: 'Zainab Bello',
     role_label:   'Legal & Regulatory Head',
-    bio:          'Managing director of Jabbamah Menorah Ltd, overseeing legal compliance and high-level strategy for our independent voice.',
+    bio:          'Managing director of Toko Technologies, overseeing legal compliance and high-level strategy for our independent voice.',
     avatar_url:   'https://picsum.photos/seed/zainab/400/500',
     twitter_url:  '',
     linkedin_url: '',
