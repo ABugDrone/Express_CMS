@@ -78,16 +78,16 @@ export const boldDarkTheme: ThemePreset = {
       fontMono: "'JetBrains Mono', 'Fira Code', monospace",
       
       fontSize: {
-        xs: '0.6875rem',
-        sm: '0.8125rem',
-        base: '0.9375rem',
-        lg: '1.0625rem',
-        xl: '1.25rem',
-        '2xl': '1.625rem',
-        '3xl': '2.25rem',
-        '4xl': '3.25rem',
-        '5xl': '4.5rem',
-        '6xl': '6rem',
+        xs: '1.03125rem',
+        sm: '1.21875rem',
+        base: '1.40625rem',
+        lg: '1.59375rem',
+        xl: '1.875rem',
+        '2xl': '2.4375rem',
+        '3xl': '3.375rem',
+        '4xl': '4.875rem',
+        '5xl': '6.75rem',
+        '6xl': '9rem',
       },
       
       fontWeight: {

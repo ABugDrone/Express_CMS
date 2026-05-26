@@ -55,16 +55,16 @@ export const editorialMagazineTheme: ThemePreset = {
       fontMono: "'Courier New', monospace",
       
       fontSize: {
-        xs: '0.75rem',
-        sm: '0.875rem',
-        base: '1rem',
-        lg: '1.125rem',
-        xl: '1.375rem',
-        '2xl': '1.75rem',
-        '3xl': '2.5rem',
-        '4xl': '3.5rem',
-        '5xl': '4.5rem',
-        '6xl': '6rem',
+        xs: '1.125rem',
+        sm: '1.3125rem',
+        base: '1.5rem',
+        lg: '1.6875rem',
+        xl: '2.0625rem',
+        '2xl': '2.625rem',
+        '3xl': '3.75rem',
+        '4xl': '5.25rem',
+        '5xl': '6.75rem',
+        '6xl': '9rem',
       },
       
       fontWeight: {

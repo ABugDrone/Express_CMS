@@ -54,16 +54,16 @@ export const modernMagazineTheme: ThemePreset = {
       fontMono: "'JetBrains Mono', monospace",
       
       fontSize: {
-        xs: '0.75rem',
-        sm: '0.875rem',
-        base: '1rem',
-        lg: '1.125rem',
-        xl: '1.25rem',
-        '2xl': '1.5rem',
-        '3xl': '2rem',
-        '4xl': '2.5rem',
-        '5xl': '3.5rem',
-        '6xl': '4.5rem',
+        xs: '1.125rem',
+        sm: '1.3125rem',
+        base: '1.5rem',
+        lg: '1.6875rem',
+        xl: '1.875rem',
+        '2xl': '2.25rem',
+        '3xl': '3rem',
+        '4xl': '3.75rem',
+        '5xl': '5.25rem',
+        '6xl': '6.75rem',
       },
       
       fontWeight: {

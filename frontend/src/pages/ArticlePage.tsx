@@ -239,13 +239,19 @@ export default function ArticlePage() {
 
             {/* Article Body */}
             <div className="prose prose-sm dark:prose-invert max-w-none"
-              style={articlePageCfg?.readingWidth ? { maxWidth: articlePageCfg.readingWidth } : undefined}>
-              <p className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 leading-relaxed border-l-4 border-amber-600 pl-4 mb-6 italic">
+              style={{
+                ...(articlePageCfg?.readingWidth ? { maxWidth: articlePageCfg.readingWidth } : {}),
+                ...(articlePageCfg?.fontSize ? { fontSize: articlePageCfg.fontSize } : {}),
+                ...(articlePageCfg?.lineHeight ? { lineHeight: articlePageCfg.lineHeight } : {}),
+              }}>
+              <p className="font-semibold text-gray-700 dark:text-gray-300 leading-relaxed border-l-4 border-amber-600 pl-4 mb-6 italic"
+                style={{ fontSize: articlePageCfg?.fontSize ? undefined : 'var(--text-base)' }}>
                 {story.excerpt}
               </p>
               {story.content ? (
-                <div className="text-sm text-gray-600 dark:text-gray-400 leading-loose space-y-4">
-                  {paragraphs.map((para, i) => (
+<div className="text-gray-600 dark:text-gray-400 space-y-4"
+                style={{ fontSize: articlePageCfg?.fontSize || 'var(--text-sm)', lineHeight: articlePageCfg?.lineHeight || 'var(--text-sm--line-height)' }}>
+                {paragraphs.map((para, i) => (
                     <p key={i}>{para}</p>
                   ))}
                 </div>

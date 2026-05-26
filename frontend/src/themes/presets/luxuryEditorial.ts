@@ -79,16 +79,16 @@ export const luxuryEditorialTheme: ThemePreset = {
       fontMono: "'IBM Plex Mono', monospace",
       
       fontSize: {
-        xs: '0.8125rem',
-        sm: '0.9375rem',
-        base: '1.0625rem',
-        lg: '1.1875rem',
-        xl: '1.375rem',
-        '2xl': '1.75rem',
-        '3xl': '2.5rem',
-        '4xl': '3.5rem',
-        '5xl': '5rem',
-        '6xl': '7rem',
+        xs: '1.21875rem',
+        sm: '1.40625rem',
+        base: '1.59375rem',
+        lg: '1.78125rem',
+        xl: '2.0625rem',
+        '2xl': '2.625rem',
+        '3xl': '3.75rem',
+        '4xl': '5.25rem',
+        '5xl': '7.5rem',
+        '6xl': '10.5rem',
       },
       
       fontWeight: {

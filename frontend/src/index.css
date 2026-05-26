@@ -17,6 +17,34 @@
   
   --radius-vibrant: 20px;
   --shadow-vibrant: var(--shadow);
+
+  /* 50% larger font sizes for readability (grumpy old men with glasses) */
+  --text-xs: 1.125rem;
+  --text-xs--line-height: 1.5rem;
+  --text-sm: 1.3125rem;
+  --text-sm--line-height: 1.75rem;
+  --text-base: 1.5rem;
+  --text-base--line-height: 2rem;
+  --text-lg: 1.6875rem;
+  --text-lg--line-height: 2.25rem;
+  --text-xl: 1.875rem;
+  --text-xl--line-height: 2.5rem;
+  --text-2xl: 2.25rem;
+  --text-2xl--line-height: 2.75rem;
+  --text-3xl: 2.8125rem;
+  --text-3xl--line-height: 3.25rem;
+  --text-4xl: 3.375rem;
+  --text-4xl--line-height: 4rem;
+  --text-5xl: 4.5rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 5.625rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 6.75rem;
+  --text-7xl--line-height: 1;
+  --text-8xl: 8.25rem;
+  --text-8xl--line-height: 1;
+  --text-9xl: 9.75rem;
+  --text-9xl--line-height: 1;
 }
 
 @layer base {
@@ -58,6 +86,17 @@
 
   body {
     @apply transition-colors duration-300;
+  }
+
+  /* Overflow protection — larger fonts must not bleed out of cards */
+  [class*="rounded"] {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+  /* Prevent flex/grid children from overflowing their containers */
+  .flex > *, [class*="grid"] > * {
+    min-width: 0;
   }
 
   @keyframes marquee {
