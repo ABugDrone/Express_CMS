@@ -9,7 +9,7 @@ interface LogoProps {
 
 const Logo = memo(function Logo({ className, variant = 'dark' }: LogoProps) {
   const isBrandDark = variant === 'dark';
-  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23D97706" stroke="%23DC2626" stroke-width="4"/><text x="50" y="58" font-family="Arial Black,sans-serif" font-size="36" font-weight="900" text-anchor="middle" fill="%23111827">JM</text></svg>`;
+  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23D97706" stroke="%23DC2626" stroke-width="4"/><text x="50" y="58" font-family="Arial Black,sans-serif" font-size="36" font-weight="900" text-anchor="middle" fill="white">JM</text></svg>`;
   const logoUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logoSvg)}`;
 
   return (
@@ -27,16 +27,14 @@ const Logo = memo(function Logo({ className, variant = 'dark' }: LogoProps) {
       <div className="flex flex-col">
         <h1 className={cn(
           "text-xl md:text-2xl font-black tracking-tight leading-none transition-all duration-300",
-          isBrandDark ? "text-white" : "text-gray-900"
-        )}
-        style={{ color: isBrandDark ? '#ffffff' : '#111827' }}>
+          isBrandDark ? "text-gray-900 dark:text-white" : "text-white"
+        )}>
           JM <span className="text-amber-600">NEWS</span>
         </h1>
         <span className={cn(
           "text-[9px] uppercase font-bold tracking-[0.3em] mt-0.5 whitespace-nowrap",
-          isBrandDark ? "text-white/60" : "text-gray-500"
-        )}
-        style={{ color: isBrandDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}>
+          isBrandDark ? "text-gray-500 dark:text-gray-400" : "text-white/60"
+        )}>
           Factual & Timely News
         </span>
       </div>
