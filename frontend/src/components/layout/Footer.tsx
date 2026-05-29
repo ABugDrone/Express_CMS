@@ -66,11 +66,11 @@ function Footer() {
             <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse inline-block" />
             Staff Active
           </span>
-          <Link to="/admin" className="text-amber-500 hover:text-amber-400 transition-colors font-bold">→ Staff Portal</Link>
+          <Link to="/staff" className="text-amber-500 hover:text-amber-400 transition-colors font-bold">→ Staff Portal</Link>
           <button onClick={logout} className="text-left text-red-500/50 hover:text-red-400 transition-colors text-xs">Sign out</button>
         </div>
       ) : (
-        <Link to="/admin" className="hover:text-white transition-colors">Staff Portal</Link>
+        <Link to="/staff" className="hover:text-white transition-colors">Staff Portal</Link>
       )}
     </li>
   );

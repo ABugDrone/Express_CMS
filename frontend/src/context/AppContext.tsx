@@ -97,6 +97,7 @@ interface AppContextType {
   isAdmin: boolean;
   isStaff: boolean;
   login: (password: string) => Promise<boolean>;
+  loginStaff: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (updates: Partial<Pick<UserProfile, 'name' | 'bio' | 'avatarUrl' | 'twitterUrl' | 'linkedinUrl'>>) => void;
   bannedUserIds: string[];
@@ -414,10 +415,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await apiLogin(password);
       setUser({
-        id:         data.role === 'admin' ? 'admin_1' : `staff_${Date.now()}`,
+        id:         data.role === 'admin' ? 'admin_1' : String(data.id ?? `staff_${Date.now()}`),
         name:       data.display_name || (data.role === 'admin' ? 'Admin' : 'Staff'),
         email:      '',
         role:       data.role,
+        staffRole:  data.staff_role,
+        staffRoles: data.staff_roles ?? [],
+        bio:        data.bio ?? '',
+        avatarUrl:  data.avatar_url ?? '',
+        twitterUrl: data.twitter_url ?? '',
+        linkedinUrl: data.linkedin_url ?? '',
+      });
+      refreshNews();
+      refreshAds();
+      return true;
+    } catch {
+      return false;
+    }
+  }, [refreshNews, refreshAds]);
+
+  const loginStaff = useCallback(async (username: string, password: string): Promise<boolean> => {
+    try {
+      const data = await apiLogin(password, username);
+      setUser({
+        id:         String(data.id ?? Date.now()),
+        name:       data.display_name || data.username || 'Staff',
+        email:      '',
+        role:       'staff',
         staffRole:  data.staff_role,
         staffRoles: data.staff_roles ?? [],
         bio:        data.bio ?? '',
@@ -490,13 +514,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const contextValue = useMemo(() => ({
     news, newsLoading, addNews, updateNews, deleteNews, refreshNews, loadMoreNews, hasMoreNews,
     ads, adsLoading, addAd, updateAd, deleteAd, getAdsByPlacement, refreshAds,
-    user, isAdmin, isStaff, login, logout, updateProfile,
+    user, isAdmin, isStaff, login, loginStaff, logout, updateProfile,
     bannedUserIds, banUser, unbanUser,
     theme, toggleTheme,
     storageSize, clearOldCache,
   }), [news, newsLoading, addNews, updateNews, deleteNews, refreshNews, loadMoreNews, hasMoreNews,
       ads, adsLoading, addAd, updateAd, deleteAd, getAdsByPlacement, refreshAds,
-      user, isAdmin, isStaff, login, logout, updateProfile,
+      user, isAdmin, isStaff, login, loginStaff, logout, updateProfile,
       bannedUserIds, banUser, unbanUser,
       theme, toggleTheme, storageSize, clearOldCache]);
 

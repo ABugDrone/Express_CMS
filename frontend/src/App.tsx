@@ -39,7 +39,7 @@ function LoadingFallback() {
 
 function AppContent() {
   const { pathname } = useLocation();
-  const { getAdsByPlacement } = useAppContext();
+  const { getAdsByPlacement, user } = useAppContext();
   const topAds = getAdsByPlacement('top');
   const adRef = useRef<HTMLDivElement>(null);
   const [breakingArticle, setBreakingArticle] = useState<{ id: number; title: string; slug: string; excerpt?: string } | null>(null);
@@ -55,6 +55,11 @@ function AppContent() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  // Redirect staff away from /admin/* to /staff/*
+  if (pathname.startsWith('/admin') && user?.role === 'staff') {
+    return <Navigate to={pathname.replace('/admin', '/staff')} replace />;
+  }
 
   // Admin dashboard renders standalone — no site header/footer/ads
   if (isAdmin) {

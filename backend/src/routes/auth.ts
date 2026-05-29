@@ -25,6 +25,8 @@ function serializeUserResponse(user: any, role: string, staffRole: string | null
   const parsedRoles = parseRoles(user.roles);
   return {
     token: signToken({ userId: user.id, role: user.role, username: user.username }),
+    id: user.id,
+    username: user.username,
     role,
     staff_role: staffRole,
     staff_roles: parsedRoles.length > 0 ? parsedRoles : (staffRole ? [staffRole] : []),
@@ -83,39 +85,58 @@ router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
           return;
         }
 
-        // Staff login: password-only (matches env.STAFF_PASSWORD)
-        if (password !== env.STAFF_PASSWORD) {
-          res.status(401).json({ error: 'Invalid credentials' });
-          return;
-        }
-
-        let staffUser = await prisma.user.findFirst({ where: { role: { not: 'admin' } } });
-        if (!staffUser) {
-          const hashedPassword = await bcrypt.hash(env.STAFF_PASSWORD, 12);
-          staffUser = await prisma.user.create({
-            data: {
-              username: 'staff',
-              email: 'staff@jmnews.com',
-              password: hashedPassword,
-              displayName: 'Staff',
-              role: 'editor',
-              roles: JSON.stringify(['editor']),
-            },
+        // Staff DB login: username + individual password (set by admin)
+        if (username && username !== 'admin') {
+          const staffUser = await prisma.user.findFirst({
+            where: { username, isActive: true },
           });
+
+          if (staffUser) {
+            const valid = await bcrypt.compare(password, staffUser.password);
+            if (valid) {
+              await prisma.user.update({
+                where: { id: staffUser.id },
+                data: { lastLogin: new Date() },
+              });
+
+              res.json(serializeUserResponse(staffUser, 'staff', staffUser.role));
+              return;
+            }
+          }
         }
 
-        if (!staffUser.isActive) {
-          res.status(403).json({ error: 'Account is deactivated' });
+        // Fallback: shared STAFF_PASSWORD (backward compatibility)
+        if (password === env.STAFF_PASSWORD) {
+          let staffUser = await prisma.user.findFirst({ where: { role: { not: 'admin' } } });
+          if (!staffUser) {
+            const hashedPassword = await bcrypt.hash(env.STAFF_PASSWORD, 12);
+            staffUser = await prisma.user.create({
+              data: {
+                username: 'staff',
+                email: 'staff@jmnews.com',
+                password: hashedPassword,
+                displayName: 'Staff',
+                role: 'editor',
+                roles: JSON.stringify(['editor']),
+              },
+            });
+          }
+
+          if (!staffUser.isActive) {
+            res.status(403).json({ error: 'Account is deactivated' });
+            return;
+          }
+
+          await prisma.user.update({
+            where: { id: staffUser.id },
+            data: { lastLogin: new Date() },
+          });
+
+          res.json(serializeUserResponse(staffUser, 'staff', staffUser.role));
           return;
         }
 
-        await prisma.user.update({
-          where: { id: staffUser.id },
-          data: { lastLogin: new Date() },
-        });
-
-        res.json(serializeUserResponse(staffUser, 'staff', staffUser.role));
-        return;
+        res.status(401).json({ error: 'Invalid credentials' });
       }
 
       case 'logout': {

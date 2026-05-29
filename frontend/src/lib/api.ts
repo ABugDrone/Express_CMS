@@ -56,8 +56,11 @@ async function request<T>(
 
 export interface LoginResponse {
   token: string;
+  id?: number;
+  username?: string;
   role: 'admin' | 'staff';
   staff_role?: 'editor' | 'reporter' | 'moderator';
+  staff_roles?: string[];
   display_name: string;
   bio: string;
   avatar_url: string;
@@ -66,10 +69,12 @@ export interface LoginResponse {
   expires: number;
 }
 
-export async function apiLogin(password: string): Promise<LoginResponse> {
+export async function apiLogin(password: string, username?: string): Promise<LoginResponse> {
+  const body: Record<string, string> = { password };
+  if (username) body.username = username;
   const data = await request<LoginResponse>('/auth?action=login', {
     method: 'POST',
-    body: JSON.stringify({ password }),
+    body: JSON.stringify(body),
   });
   setToken(data.token);
   return data;

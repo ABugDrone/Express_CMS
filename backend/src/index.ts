@@ -69,6 +69,12 @@ app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads'), {
   },
 }));
 
+// In production, serve the built frontend
+if (!isDevelopment) {
+  const publicPath = path.resolve(process.cwd(), 'public');
+  app.use(express.static(publicPath, { maxAge: '1y' }));
+}
+
 // ── API Routes ───────────────────────────────────────────────────────────────
 
 app.use('/api', authRoutes);
@@ -148,6 +154,16 @@ app.post('/api/stats/article/:id/views', async (req, res) => {
     res.json({ views: article.views });
   } catch {
     res.status(404).json({ error: 'Article not found' });
+  }
+});
+
+// ── SPA fallback (production) ───────────────────────────────────────────────
+// Must come after all API routes so it only catches client-side routes
+app.get('*', (_req, res) => {
+  if (!isDevelopment) {
+    res.sendFile(path.resolve(process.cwd(), 'public', 'index.html'));
+  } else {
+    res.status(404).json({ error: 'Not found' });
   }
 });
 
