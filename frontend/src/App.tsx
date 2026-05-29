@@ -24,6 +24,7 @@ const AdvertisePage = lazy(() => import('./pages/AdvertisePage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const StaffDashboard = lazy(() => import('./pages/StaffDashboard'));
 const ThemeManager = lazy(() => import('./pages/admin/ThemeManager'));
 const ThemeCustomizer = lazy(() => import('./pages/admin/ThemeCustomizer'));
 const ThemeImport = lazy(() => import('./pages/admin/ThemeImport'));
@@ -65,8 +66,8 @@ function AppContent() {
           <Route path="/admin/themes" element={<ThemeManager />} />
           <Route path="/admin/themes/customize" element={<ThemeCustomizer />} />
           <Route path="/admin/themes/import" element={<ThemeImport />} />
-          <Route path="/staff" element={<Navigate to="/staff/post_news" replace />} />
-          <Route path="/staff/:tab" element={<AdminDashboard />} />
+          <Route path="/staff" element={<Navigate to="/staff/dashboard" replace />} />
+          <Route path="/staff/:tab" element={<StaffDashboard />} />
         </Routes>
       </Suspense>
     );

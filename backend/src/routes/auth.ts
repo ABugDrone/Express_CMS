@@ -15,11 +15,18 @@ const loginLimiter = rateLimit({
 
 const router = Router();
 
+function parseRoles(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try { const parsed = JSON.parse(raw); return Array.isArray(parsed) ? parsed : []; }
+  catch { return []; }
+}
+
 function serializeUserResponse(user: any, role: string, staffRole: string | null) {
   return {
     token: signToken({ userId: user.id, role: user.role, username: user.username }),
     role,
     staff_role: staffRole,
+    staff_roles: parseRoles(user.roles),
     display_name: user.displayName || user.username,
     bio: user.bio || '',
     avatar_url: user.avatarUrl || '',
@@ -91,6 +98,7 @@ router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
               password: hashedPassword,
               displayName: 'Staff',
               role: 'editor',
+              roles: JSON.stringify(['editor']),
             },
           });
         }
@@ -141,6 +149,7 @@ router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
             twitterUrl: true,
             linkedinUrl: true,
             role: true,
+            roles: true,
             isActive: true,
             lastLogin: true,
           },
@@ -156,6 +165,8 @@ router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
           return;
         }
 
+        const staffRoles = parseRoles(user.roles);
+
         res.json({
           id: user.id,
           name: user.displayName || user.username,
@@ -163,6 +174,7 @@ router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
           email: user.email,
           role: user.role === 'admin' ? 'admin' : 'staff',
           staffRole: user.role === 'admin' ? null : user.role,
+          staffRoles,
           bio: user.bio || '',
           avatarUrl: user.avatarUrl || '',
           avatar_url: user.avatarUrl || '',

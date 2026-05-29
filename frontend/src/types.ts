@@ -60,6 +60,7 @@ export interface UserProfile {
   email: string;
   role: 'user' | 'admin' | 'staff';
   staffRole?: 'editor' | 'reporter' | 'moderator';
+  staffRoles?: string[];
   bio?: string;
   avatarUrl?: string;
   twitterUrl?: string;

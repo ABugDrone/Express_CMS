@@ -10,9 +10,9 @@ datasource db {
 // ── Users & Auth ──────────────────────────────────────────────────────────────
 
 model User {
-  id          Int      @id @default(autoincrement())
-  username    String   @unique
-  email       String   @unique
+  id          Int       @id @default(autoincrement())
+  username    String?   @unique
+  email       String?   @unique
   password    String
   fullName    String?
   displayName String?
@@ -21,6 +21,7 @@ model User {
   twitterUrl  String?
   linkedinUrl String?
   role        String   @default("staff")
+  roles       String   @default("[]")
   isActive    Boolean  @default(true)
   lastLogin   DateTime?
   createdAt   DateTime @default(now())

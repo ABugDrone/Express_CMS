@@ -136,6 +136,12 @@ function LoginScreen() {
             {loading ? 'Authorizing...' : 'Authorize'}
           </button>
         </div>
+
+        <Link to="/"
+          className="mt-8 text-white/30 text-xs font-bold uppercase tracking-widest hover:text-white/60 transition-colors"
+        >
+          ← Back to Homepage
+        </Link>
       </motion.form>
     </div>
   );
@@ -456,14 +462,18 @@ function NewsTab() {
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       {/* Delete — admin only */}
-                      {isAdmin && (
-                        <button
-                          onClick={() => setConfirmDelete(n.id)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                      <button
+                        onClick={() => isAdmin && setConfirmDelete(n.id)}
+                        disabled={!isAdmin}
+                        title={isAdmin ? 'Delete' : 'Admin only'}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          isAdmin
+                            ? 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
+                            : 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-30 blur-[0.5px]'
+                        }`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -783,24 +793,25 @@ function CommentsTab() {
                   className={`p-1.5 rounded-lg transition-colors ${c.is_spam ? 'text-red-500 bg-red-100 dark:bg-red-900/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'}`}>
                   <AlertTriangle className="w-3.5 h-3.5" />
                 </button>
-                {isAdmin && c.author_id && !bannedUserIds.includes(c.author_id) && (
-                  <button onClick={() => handleBan(c.author_id)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors">
+                {(isAdmin || c.author_id) && !bannedUserIds.includes(c.author_id) && (
+                  <button onClick={() => isAdmin && handleBan(c.author_id)}
+                    disabled={!isAdmin} title={isAdmin ? 'Ban user' : 'Admin only'}
+                    className={`p-1.5 rounded-lg transition-colors ${isAdmin ? 'text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/10' : 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-30 blur-[0.5px]'}`}>
                     <ShieldBan className="w-3.5 h-3.5" />
                   </button>
                 )}
-                {isAdmin && c.author_id && bannedUserIds.includes(c.author_id) && (
-                  <button onClick={() => handleUnban(c.author_id)}
-                    className="p-1.5 rounded-lg text-orange-500 bg-orange-100 dark:bg-orange-900/20 transition-colors">
+                {(isAdmin || c.author_id) && bannedUserIds.includes(c.author_id) && (
+                  <button onClick={() => isAdmin && handleUnban(c.author_id)}
+                    disabled={!isAdmin} title={isAdmin ? 'Unban user' : 'Admin only'}
+                    className={`p-1.5 rounded-lg transition-colors ${isAdmin ? 'text-orange-500 bg-orange-100 dark:bg-orange-900/20' : 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-30 blur-[0.5px]'}`}>
                     <ShieldCheck className="w-3.5 h-3.5" />
                   </button>
                 )}
-                {isAdmin && (
-                  <button onClick={() => setConfirmDelete(c.id)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                <button onClick={() => isAdmin && setConfirmDelete(c.id)}
+                  disabled={!isAdmin} title={isAdmin ? 'Delete comment' : 'Admin only'}
+                  className={`p-1.5 rounded-lg transition-colors ${isAdmin ? 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10' : 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-30 blur-[0.5px]'}`}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           </div>
@@ -826,8 +837,17 @@ function CommentsTab() {
 interface ApiStaffRow {
   id: number; username: string; email: string; full_name: string;
   display_name: string; role: 'editor' | 'reporter' | 'moderator';
+  roles: string[];
   is_active: number; last_login: string; created_at: string;
 }
+
+const VALID_ROLES = ['editor', 'reporter', 'moderator'] as const;
+
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  editor: 'writes and edits articles',
+  reporter: 'files reports and updates',
+  moderator: 'manages comments',
+};
 
 function StaffTab() {
   const [staff, setStaff]           = useState<ApiStaffRow[]>([]);
@@ -835,10 +855,11 @@ function StaffTab() {
   const [showForm, setShowForm]     = useState(false);
   const [editTarget, setEditTarget] = useState<ApiStaffRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
-  const [form, setForm] = useState({
-    email: '', full_name: '', password: '',
-    role: 'editor' as 'editor' | 'reporter' | 'moderator',
+const [form, setForm] = useState({
+    full_name: '', password: '',
+    roles: ['editor'] as string[],
   });
+
   const [showPw, setShowPw]     = useState(false);
   const [formError, setFormError] = useState('');
   const [saving, setSaving]     = useState(false);
@@ -854,31 +875,30 @@ function StaffTab() {
 
   const openCreate = () => {
     setEditTarget(null);
-    setForm({ email: '', full_name: '', password: '', role: 'editor' });
+    setForm({ full_name: '', password: '', roles: ['editor'] });
     setFormError(''); setShowForm(true);
   };
 
   const openEdit = (s: ApiStaffRow) => {
     setEditTarget(s);
-    setForm({ email: s.email, full_name: s.full_name, password: '', role: s.role });
+    setForm({ full_name: s.full_name, password: '', roles: s.roles?.length ? s.roles : [s.role] });
     setFormError(''); setShowForm(true);
   };
 
-  const handleSave = async () => {
+const handleSave = async () => {
     setFormError('');
-    if (!form.email.trim()) { setFormError('Email is required.'); return; }
+    if (form.roles.length === 0) { setFormError('Select at least one role.'); return; }
     if (!editTarget && form.password.length < 8) { setFormError('Password must be at least 8 characters.'); return; }
     if (form.password && form.password.length < 8) { setFormError('Password must be at least 8 characters.'); return; }
     setSaving(true);
     try {
-      const safeUsername = form.email.trim().toLowerCase().replace(/@/g, '_').replace(/[^a-z0-9_]/g, '').slice(0, 30);
       if (editTarget) {
         await apiUpdateStaff(editTarget.id, {
-          email: form.email, full_name: form.full_name, role: form.role,
+          full_name: form.full_name, roles: form.roles,
           ...(form.password ? { password: form.password } : {}),
         });
       } else {
-        await apiCreateStaff({ username: safeUsername, email: form.email, password: form.password, full_name: form.full_name, role: form.role });
+        await apiCreateStaff({ password: form.password, full_name: form.full_name, roles: form.roles });
       }
       await loadStaffFromApi();
       setShowForm(false); setEditTarget(null);
@@ -925,8 +945,10 @@ function StaffTab() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                <span className="font-black text-vibrant-text dark:text-white text-sm">{s.display_name || s.full_name || s.username}</span>
-                <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${ROLE_COLORS[s.role]}`}>{s.role}</span>
+                <span className="font-black text-vibrant-text dark:text-white text-sm">{s.display_name || s.full_name || s.username || 'Staff'}</span>
+                {(s.roles?.length ? s.roles : [s.role]).map(r => (
+                  <span key={r} className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${ROLE_COLORS[r] ?? ''}`}>{r}</span>
+                ))}
                 <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${s.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-500'}`}>
                   {s.is_active ? 'Active' : 'Inactive'}
                 </span>
@@ -1016,13 +1038,27 @@ function StaffTab() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Role *</label>
-                  <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value as typeof form.role }))}
-                    className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-vibrant-text dark:text-white focus:outline-none focus:ring-2 focus:ring-vibrant-primary/30">
-                    <option value="editor">Editor — writes and edits articles</option>
-                    <option value="reporter">Reporter — files reports and updates</option>
-                    <option value="moderator">Moderator — manages comments</option>
-                  </select>
+                  <label className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Roles *</label>
+                  <div className="flex flex-col gap-2">
+                    {VALID_ROLES.map(r => {
+                      const checked = form.roles.includes(r);
+                      return (
+                        <label key={r} className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl cursor-pointer hover:border-vibrant-primary/30 transition-colors">
+                          <input type="checkbox" checked={checked} onChange={() => {
+                            setForm(p => ({
+                              ...p,
+                              roles: checked ? p.roles.filter(x => x !== r) : [...p.roles, r],
+                            }));
+                          }}
+                            className="w-4 h-4 rounded border-gray-300 text-vibrant-primary focus:ring-vibrant-primary" />
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-vibrant-text dark:text-white capitalize">{r}</p>
+                            <p className="text-[10px] text-gray-400">{ROLE_DESCRIPTIONS[r]}</p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <AnimatePresence>
@@ -1411,20 +1447,31 @@ function ConfirmDialog({ open, title, message, onConfirm, onCancel }: {
 
 // ─── Staff Portal Shell ───────────────────────────────────────────────────────
 
-type StaffTab = 'post_news' | 'post_ads' | 'comments' | 'profile';
+type StaffTab = 'post_news' | 'post_ads' | 'comments' | 'profile' | 'overview';
 
 const STAFF_TABS: { id: StaffTab; label: string; icon: React.ElementType }[] = [
-  { id: 'post_news',  label: 'Post News',   icon: Newspaper },
-  { id: 'post_ads',   label: 'Post Ads',    icon: Megaphone },
-  { id: 'comments',   label: 'Moderation',  icon: MessageSquare },
-  { id: 'profile',    label: 'My Profile',  icon: User },
+  { id: 'overview',   label: 'News Contents',  icon: LayoutDashboard },
+  { id: 'post_news',  label: 'Post News',      icon: Newspaper },
+  { id: 'post_ads',   label: 'Post Ads',       icon: Megaphone },
+  { id: 'comments',   label: 'Moderation',     icon: MessageSquare },
+  { id: 'profile',    label: 'My Profile',     icon: User },
 ];
+
+function RestrictedAccess() {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <Lock className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4" />
+      <h2 className="text-lg font-black uppercase tracking-tight text-gray-400 dark:text-gray-500 mb-2">Admin Access Required</h2>
+      <p className="text-sm text-gray-400 dark:text-gray-600 max-w-sm">This section is restricted to administrators only. Contact your admin for access.</p>
+    </div>
+  );
+}
 
 function StaffPortal() {
   const { user, logout } = useAppContext();
   const { tab: urlTab } = useParams<{ tab: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<StaffTab>(() => (STAFF_URL_TO_TAB[urlTab ?? ''] as StaffTab) || 'post_news');
+  const [activeTab, setActiveTab] = useState<StaffTab>(() => (STAFF_URL_TO_TAB[urlTab ?? ''] as StaffTab) || 'overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const lastTabRef = useRef(activeTab);
@@ -1452,10 +1499,12 @@ function StaffPortal() {
 
   const renderTab = () => {
     switch (activeTab) {
+      case 'overview':  return <OverviewTab onTabChange={handleTabChange} />;
       case 'post_news': return <NewsTab />;
       case 'post_ads':  return <AdsTab />;
       case 'comments':  return <CommentsTab />;
       case 'profile':   return <ProfileTab />;
+      default:          return <RestrictedAccess />;
     }
   };
 
@@ -1497,11 +1546,38 @@ function StaffPortal() {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 flex flex-col gap-1">
-          {STAFF_TABS.map(tab => {
+        <nav className="flex-1 p-4 flex flex-col gap-1 overflow-y-auto">
+          {TAB_CONFIG.map((tab, idx) => {
             const Icon = tab.icon;
-            const tabUrl = STAFF_TAB_TO_URL[tab.id];
+            const isDisabled = tab.adminOnly;
+            const isStaffTab = STAFF_TABS.some(t => t.id === tab.id);
+            if (!isDisabled && !isStaffTab) return null;
+
+            const tabUrl = STAFF_TAB_TO_URL[tab.id as StaffTab];
             const active = activeTab === tab.id;
+
+            const isFirstAdminOnly = idx === TAB_CONFIG.findIndex(t => t.adminOnly);
+
+            if (isDisabled) {
+              return (
+                <React.Fragment key={tab.id}>
+                  {isFirstAdminOnly && (
+                    <div className="pt-3 pb-1">
+                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 px-2">Admin Only</p>
+                    </div>
+                  )}
+                  <div
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-400 dark:text-gray-600 cursor-not-allowed select-none pointer-events-none opacity-40 blur-[0.5px]"
+                    title="Admin access required"
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    {tab.label}
+                    <Lock className="w-3 h-3 ml-auto shrink-0" />
+                  </div>
+                </React.Fragment>
+              );
+            }
+
             return (
               <Link key={tab.id}
                 to={`/staff/${tabUrl}`}
@@ -1618,6 +1694,10 @@ const STAFF_URL_TO_TAB: Record<string, StaffTab> = {
   post_ads: 'post_ads',
   comments: 'comments',
   profile: 'profile',
+  dashboard: 'overview',
+  overview: 'overview',
+  news: 'post_news',
+  ads: 'post_ads',
 };
 
 const STAFF_TAB_TO_URL: Record<StaffTab, string> = {
@@ -1625,6 +1705,7 @@ const STAFF_TAB_TO_URL: Record<StaffTab, string> = {
   post_ads: 'post_ads',
   comments: 'comments',
   profile: 'profile',
+  overview: 'dashboard',
 };
 
 function DashboardShell() {

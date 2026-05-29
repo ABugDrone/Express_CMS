@@ -22,6 +22,12 @@ function isStrongPassword(password: string): boolean {
   return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password);
 }
 
+function parseRoles(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try { const parsed = JSON.parse(raw); return Array.isArray(parsed) ? parsed.filter((r: string) => VALID_ROLES.includes(r)) : []; }
+  catch { return []; }
+}
+
 function serializeStaff(s: any) {
   return {
     id: s.id,
@@ -34,6 +40,7 @@ function serializeStaff(s: any) {
     twitter_url: s.twitterUrl || '',
     linkedin_url: s.linkedinUrl || '',
     role: s.role,
+    roles: parseRoles(s.roles),
     is_active: s.isActive ? 1 : 0,
     last_login: s.lastLogin?.toISOString() || null,
     created_at: s.createdAt.toISOString(),
@@ -55,6 +62,7 @@ router.get('/staff', authenticate, async (_req: Request, res: Response) => {
         twitterUrl: true,
         linkedinUrl: true,
         role: true,
+        roles: true,
         isActive: true,
         lastLogin: true,
         createdAt: true,
@@ -71,19 +79,33 @@ router.get('/staff', authenticate, async (_req: Request, res: Response) => {
 
 router.post('/staff', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
-    const { username, email, password, full_name, role } = req.body;
+    const { username, email, password, full_name, role, roles } = req.body;
 
-    if (!username || !email || !password) {
-      res.status(400).json({ error: 'username, email, and password are required' });
+    if (!password) {
+      res.status(400).json({ error: 'password is required' });
       return;
     }
 
-    if (username.length < 3 || username.length > 50 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+    let safeRoles: string[];
+    if (Array.isArray(roles) && roles.length > 0) {
+      safeRoles = roles.filter((r: string) => VALID_ROLES.includes(r));
+      if (safeRoles.length === 0) {
+        res.status(400).json({ error: `At least one valid role required: ${VALID_ROLES.join(', ')}` });
+        return;
+      }
+    } else {
+      safeRoles = role && VALID_ROLES.includes(role) ? [role] : ['reporter'];
+    }
+
+    const safeUsername = username || (full_name || 'staff').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').slice(0, 30);
+    const safeEmail = email || `${safeUsername}@staff.local`;
+
+    if (safeUsername.length < 3 || safeUsername.length > 50 || !/^[a-zA-Z0-9_]+$/.test(safeUsername)) {
       res.status(400).json({ error: 'Username must be 3-50 alphanumeric characters' });
       return;
     }
 
-    if (!isValidEmail(email) || email.length > 255) {
+    if (!isValidEmail(safeEmail) || safeEmail.length > 255) {
       res.status(400).json({ error: 'Valid email is required' });
       return;
     }
@@ -93,13 +115,8 @@ router.post('/staff', authenticate, requireAdmin, async (req: Request, res: Resp
       return;
     }
 
-    if (role && !VALID_ROLES.includes(role)) {
-      res.status(400).json({ error: `Role must be one of: ${VALID_ROLES.join(', ')}` });
-      return;
-    }
-
     const existing = await prisma.user.findFirst({
-      where: { OR: [{ username }, { email }] },
+      where: { OR: [{ username: safeUsername }, { email: safeEmail }] },
     });
     if (existing) {
       res.status(409).json({ error: 'Username or email already exists' });
@@ -109,12 +126,13 @@ router.post('/staff', authenticate, requireAdmin, async (req: Request, res: Resp
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
       data: {
-        username,
-        email,
+        username: safeUsername,
+        email: safeEmail,
         password: hashedPassword,
         fullName: full_name || null,
-        displayName: full_name || username,
-        role: role || 'reporter',
+        displayName: full_name || safeUsername,
+        role: safeRoles[0],
+        roles: JSON.stringify(safeRoles),
       },
     });
 
@@ -133,7 +151,7 @@ router.put('/staff', authenticate, requireAdmin, async (req: Request, res: Respo
       return;
     }
 
-    const { username, email, password, full_name, display_name, bio, avatar_url, twitter_url, linkedin_url, role, is_active } = req.body;
+    const { username, email, password, full_name, display_name, bio, avatar_url, twitter_url, linkedin_url, role, roles, is_active } = req.body;
 
     if (username !== undefined && (username.length < 3 || username.length > 50 || !/^[a-zA-Z0-9_]+$/.test(username))) {
       res.status(400).json({ error: 'Username must be 3-50 alphanumeric characters' });
@@ -150,11 +168,6 @@ router.put('/staff', authenticate, requireAdmin, async (req: Request, res: Respo
       return;
     }
 
-    if (role !== undefined && !VALID_ROLES.includes(role)) {
-      res.status(400).json({ error: `Role must be one of: ${VALID_ROLES.join(', ')}` });
-      return;
-    }
-
     const data: any = {};
     if (username !== undefined) data.username = username;
     if (email !== undefined) data.email = email;
@@ -165,8 +178,22 @@ router.put('/staff', authenticate, requireAdmin, async (req: Request, res: Respo
     if (avatar_url !== undefined) data.avatarUrl = avatar_url;
     if (twitter_url !== undefined) data.twitterUrl = twitter_url;
     if (linkedin_url !== undefined) data.linkedinUrl = linkedin_url;
-    if (role !== undefined) data.role = role;
     if (is_active !== undefined) data.isActive = is_active === 1 || is_active === true;
+
+    if (Array.isArray(roles) && roles.length > 0) {
+      const safeRoles = roles.filter((r: string) => VALID_ROLES.includes(r));
+      if (safeRoles.length > 0) {
+        data.role = safeRoles[0];
+        data.roles = JSON.stringify(safeRoles);
+      }
+    } else if (role !== undefined) {
+      if (!VALID_ROLES.includes(role)) {
+        res.status(400).json({ error: `Role must be one of: ${VALID_ROLES.join(', ')}` });
+        return;
+      }
+      data.role = role;
+      data.roles = JSON.stringify([role]);
+    }
 
     const user = await prisma.user.update({
       where: { id: staffId },

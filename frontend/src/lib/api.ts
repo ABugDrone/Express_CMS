@@ -279,6 +279,7 @@ export interface ApiStaff {
   twitter_url: string;
   linkedin_url: string;
   role: 'editor' | 'reporter' | 'moderator';
+  roles: string[];
   is_active: number;
   last_login: string;
   created_at: string;
@@ -290,7 +291,7 @@ export async function apiGetStaff() {
 
 export async function apiCreateStaff(data: {
   username: string; email: string; password: string;
-  full_name?: string; role: string;
+  full_name?: string; role?: string; roles?: string[];
 }) {
   return request<{ id: number }>('/staff', {
     method: 'POST',
