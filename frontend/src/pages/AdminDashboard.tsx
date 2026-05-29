@@ -836,7 +836,7 @@ function StaffTab() {
   const [editTarget, setEditTarget] = useState<ApiStaffRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [form, setForm] = useState({
-    username: '', email: '', full_name: '', password: '',
+    email: '', full_name: '', password: '',
     role: 'editor' as 'editor' | 'reporter' | 'moderator',
   });
   const [showPw, setShowPw]     = useState(false);
@@ -854,30 +854,31 @@ function StaffTab() {
 
   const openCreate = () => {
     setEditTarget(null);
-    setForm({ username: '', email: '', full_name: '', password: '', role: 'editor' });
+    setForm({ email: '', full_name: '', password: '', role: 'editor' });
     setFormError(''); setShowForm(true);
   };
 
   const openEdit = (s: ApiStaffRow) => {
     setEditTarget(s);
-    setForm({ username: s.username, email: s.email, full_name: s.full_name, password: '', role: s.role });
+    setForm({ email: s.email, full_name: s.full_name, password: '', role: s.role });
     setFormError(''); setShowForm(true);
   };
 
   const handleSave = async () => {
     setFormError('');
-    if (!form.username.trim() || !form.email.trim()) { setFormError('Username and email are required.'); return; }
+    if (!form.email.trim()) { setFormError('Email is required.'); return; }
     if (!editTarget && form.password.length < 8) { setFormError('Password must be at least 8 characters.'); return; }
     if (form.password && form.password.length < 8) { setFormError('Password must be at least 8 characters.'); return; }
     setSaving(true);
     try {
+      const safeUsername = form.email.trim().toLowerCase().replace(/@/g, '_').replace(/[^a-z0-9_]/g, '').slice(0, 30);
       if (editTarget) {
         await apiUpdateStaff(editTarget.id, {
           email: form.email, full_name: form.full_name, role: form.role,
           ...(form.password ? { password: form.password } : {}),
         });
       } else {
-        await apiCreateStaff({ username: form.username, email: form.email, password: form.password, full_name: form.full_name, role: form.role });
+        await apiCreateStaff({ username: safeUsername, email: form.email, password: form.password, full_name: form.full_name, role: form.role });
       }
       await loadStaffFromApi();
       setShowForm(false); setEditTarget(null);
@@ -981,7 +982,6 @@ function StaffTab() {
               <div className="p-6 flex flex-col gap-4">
                 {[
                   { label: 'Full Name', key: 'full_name', placeholder: 'Jane Doe' },
-                  { label: 'Username *', key: 'username', placeholder: 'jane_editor', disabled: !!editTarget },
                   { label: 'Email *', key: 'email', placeholder: 'jane@yoursite.com' },
                 ].map(({ label, key, placeholder, disabled }) => (
                   <div key={key} className="flex flex-col gap-1.5">
