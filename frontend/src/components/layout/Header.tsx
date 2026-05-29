@@ -130,7 +130,7 @@ function Header() {
 
   const mainBar = (
     <div className={cn(
-      "flex items-center px-4 lg:px-8 h-16 md:h-20 transition-all duration-300",
+      "flex items-center px-4 lg:px-8 h-16 md:h-20 transition-all duration-300 flex-nowrap",
       isScrolled ? "h-14 shadow-md shadow-amber-600/5" : ""
     )}
     style={{
@@ -143,13 +143,13 @@ function Header() {
       </div>
 
       {/* Center: Category Nav (desktop) */}
-      <nav className="hidden lg:flex flex-1 justify-center">
-        <ul className="flex gap-1 text-[11px] font-bold uppercase tracking-wider">
+      <nav className="hidden lg:flex flex-1 justify-center overflow-x-auto">
+        <ul className="flex gap-1 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap">
           {navCategories.map(item => (
             <li key={item.slug}>
               <Link
                 to={`/category/${item.slug}`}
-                className="px-3 py-1.5 text-gray-600 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-600/10 rounded transition-all"
+                className="px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-600/10 rounded transition-all whitespace-nowrap block"
               >
                 {item.name}
               </Link>
@@ -157,7 +157,7 @@ function Header() {
           ))}
           <li>
             <Link to="/about"
-              className="px-3 py-1.5 text-gray-600 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-600/10 rounded transition-all">
+              className="px-2 py-1.5 text-gray-600 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-600/10 rounded transition-all whitespace-nowrap block">
               About JM News
             </Link>
           </li>
