@@ -22,11 +22,12 @@ function parseRoles(raw: string | null | undefined): string[] {
 }
 
 function serializeUserResponse(user: any, role: string, staffRole: string | null) {
+  const parsedRoles = parseRoles(user.roles);
   return {
     token: signToken({ userId: user.id, role: user.role, username: user.username }),
     role,
     staff_role: staffRole,
-    staff_roles: parseRoles(user.roles),
+    staff_roles: parsedRoles.length > 0 ? parsedRoles : (staffRole ? [staffRole] : []),
     display_name: user.displayName || user.username,
     bio: user.bio || '',
     avatar_url: user.avatarUrl || '',
@@ -165,7 +166,8 @@ router.all('/auth', loginLimiter, async (req: Request, res: Response) => {
           return;
         }
 
-        const staffRoles = parseRoles(user.roles);
+        const rawRoles = parseRoles(user.roles);
+        const staffRoles = rawRoles.length > 0 ? rawRoles : (user.role !== 'admin' && user.role ? [user.role] : []);
 
         res.json({
           id: user.id,

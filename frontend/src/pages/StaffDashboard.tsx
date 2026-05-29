@@ -722,7 +722,10 @@ export default function StaffDashboard() {
               </div>
               <div>
                 <p className="text-sm font-black uppercase tracking-tight text-vibrant-text dark:text-white">JM News</p>
-                <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest">Staff Dashboard</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[9px] font-black uppercase tracking-widest bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded">STAFF</span>
+                  <span className="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-widest">Dashboard</span>
+                </div>
               </div>
             </div>
             <Link to="/" title="Go to Homepage"
@@ -775,12 +778,15 @@ export default function StaffDashboard() {
             <div className="w-8 h-8 rounded-lg bg-vibrant-primary/10 flex items-center justify-center shrink-0">
               <span className="text-vibrant-primary font-black text-xs uppercase">{user?.name?.[0] ?? 'S'}</span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-vibrant-text dark:text-white truncate">{user?.name}</p>
-              <p className="text-[10px] text-gray-400 capitalize">
-                Staff · {(user?.staffRoles ?? [user?.staffRole]).filter(Boolean).join(', ')}
-              </p>
-            </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-vibrant-text dark:text-white truncate">{user?.name}</p>
+                <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                  <span className="text-[8px] font-black uppercase tracking-widest bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-1 py-0.5 rounded">STAFF</span>
+                  {(user?.staffRoles ?? [user?.staffRole]).filter(Boolean).map(r => (
+                    <span key={r} className="text-[8px] font-black uppercase text-gray-400 dark:text-gray-500">{r}</span>
+                  ))}
+                </div>
+              </div>
           </div>
           <button onClick={logout}
             className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-500 transition-colors">
@@ -801,8 +807,8 @@ export default function StaffDashboard() {
               {currentTab?.label}
             </h1>
           </div>
-          <span className="text-[10px] font-black uppercase px-3 py-1.5 rounded-full hidden sm:inline-flex bg-vibrant-primary/10 text-vibrant-primary">
-            Staff
+          <span className="text-[10px] font-black uppercase px-3 py-1.5 rounded-full hidden sm:inline-flex bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+            STAFF
           </span>
         </header>
 

@@ -1795,7 +1795,10 @@ function DashboardShell() {
                 </div>
                 <div>
                   <p className="text-sm font-black uppercase tracking-tight text-vibrant-text dark:text-white">JM News</p>
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest">Admin Panel</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest bg-vibrant-primary/15 text-vibrant-primary px-1.5 py-0.5 rounded">ADMIN</span>
+                    <span className="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-widest">Dashboard</span>
+                  </div>
                 </div>
               </div>
               <Link to="/" title="Go to Homepage"
@@ -1862,9 +1865,9 @@ function DashboardShell() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black text-vibrant-text dark:text-white truncate">{user?.name}</p>
-                <p className="text-[10px] text-gray-400 capitalize">
-                  {user?.role === 'staff' ? `Staff · ${user.staffRole}` : 'Administrator'}
-                </p>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-[8px] font-black uppercase tracking-widest bg-vibrant-primary/15 text-vibrant-primary px-1 py-0.5 rounded">ADMIN</span>
+                </div>
               </div>
             </div>
             <button onClick={logout}
@@ -1894,10 +1897,10 @@ function DashboardShell() {
           {/* Role badge */}
           <span className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-full hidden sm:inline-flex ${
             isAdmin
-              ? 'bg-vibrant-primary/10 text-vibrant-primary'
+              ? 'bg-vibrant-primary/15 text-vibrant-primary ring-1 ring-vibrant-primary/30'
               : `${ROLE_COLORS[user?.staffRole ?? 'editor']}`
           }`}>
-            {isAdmin ? 'Admin' : `Staff · ${user?.staffRole}`}
+            {isAdmin ? 'ADMIN' : `Staff · ${user?.staffRole}`}
           </span>
         </header>
 
